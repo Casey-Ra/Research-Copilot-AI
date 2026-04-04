@@ -5,6 +5,7 @@ import { generateQueryEmbedding } from "@/lib/embeddings";
 
 export type RetrievalResult = {
   chunkId: string;
+  chunkIndex: number;
   score: number;
   documentId: string;
   documentTitle: string;
@@ -82,6 +83,7 @@ export async function semanticSearchDocuments(input: {
     },
     select: {
       id: true,
+      chunkIndex: true,
       documentId: true,
       text: true,
       pageNumber: true,
@@ -109,6 +111,7 @@ export async function semanticSearchDocuments(input: {
 
       return {
         chunkId: chunk.id,
+        chunkIndex: chunk.chunkIndex,
         score: cosineSimilarity(queryEmbedding.vector, embedding),
         documentId: chunk.documentId,
         documentTitle: chunk.document.title,
