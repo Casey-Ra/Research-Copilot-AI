@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
-import { CreateDocumentForm } from "@/components/documents/CreateDocumentForm";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { requireUser } from "@/lib/auth/session";
 import { getUserDocuments } from "@/lib/db/documents";
@@ -14,16 +14,35 @@ export default async function DocumentsPage() {
       <PageHeader
         eyebrow="Documents"
         title="Manage the research corpus for this workspace"
-        description="This page now shows real user-owned document records from the database and includes a simple draft-create flow until the full upload pipeline lands in the next phase."
+        description="This page now shows real user-owned document records created through the local upload pipeline. Uploads, statuses, storage paths, and ownership all flow through the server-side document services."
       />
 
-      <CreateDocumentForm />
+      <section className="flex flex-col gap-4 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+        <div className="space-y-2">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">Upload pipeline</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
+            Add TXT, PDF, or pasted text
+          </h2>
+          <p className="max-w-2xl text-sm leading-7 text-slate-600">
+            Uploaded files are stored locally for development and document records are created with
+            an `UPLOADED` status so the parsing phase can pick them up next.
+          </p>
+        </div>
+        <Link
+          href="/upload"
+          className="inline-flex rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+        >
+          Open upload page
+        </Link>
+      </section>
 
       {documents.length === 0 ? (
         <EmptyState
           eyebrow="Documents"
           title="No documents yet"
-          description="Create a draft document above to start populating your workspace. File uploads, storage, and parsing will replace this bridge workflow in the next phases."
+          description="Upload a TXT or PDF file, or paste text into the upload page to create your first document record."
+          actionLabel="Go to upload"
+          actionHref="/upload"
         />
       ) : (
         <div className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
@@ -38,6 +57,7 @@ export default async function DocumentsPage() {
               updatedAt={document.updatedAt}
               chunkCount={document._count.chunks}
               noteCount={document._count.notes}
+              fileSizeBytes={document.fileSizeBytes}
             />
           ))}
         </div>

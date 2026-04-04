@@ -4,6 +4,7 @@ import { SignOutButton } from "@/components/auth/SignOutButton";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/upload", label: "Upload" },
   { href: "/documents", label: "Documents" },
   { href: "/search", label: "Search" },
   { href: "/chat", label: "Chat" },

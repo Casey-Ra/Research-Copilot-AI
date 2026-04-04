@@ -12,6 +12,7 @@ type DocumentCardProps = {
   updatedAt: Date;
   chunkCount: number;
   noteCount: number;
+  fileSizeBytes: number | null;
 };
 
 function getStatusTone(status: DocumentStatus) {
@@ -36,6 +37,7 @@ export function DocumentCard({
   updatedAt,
   chunkCount,
   noteCount,
+  fileSizeBytes,
 }: DocumentCardProps) {
   return (
     <article className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
@@ -59,6 +61,12 @@ export function DocumentCard({
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Notes</p>
             <p className="mt-1 text-lg font-semibold text-slate-950">{noteCount}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Size</p>
+            <p className="mt-1 text-lg font-semibold text-slate-950">
+              {fileSizeBytes ? `${Math.max(1, Math.round(fileSizeBytes / 1024))} KB` : "-"}
+            </p>
           </div>
         </div>
 

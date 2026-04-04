@@ -3,6 +3,7 @@ export const DEFAULT_LOGOUT_REDIRECT = "/";
 
 export const PROTECTED_PATH_PREFIXES = [
   "/dashboard",
+  "/upload",
   "/documents",
   "/search",
   "/chat",

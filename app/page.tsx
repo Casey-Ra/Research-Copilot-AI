@@ -2,6 +2,11 @@ import Link from "next/link";
 
 const sections = [
   {
+    href: "/upload",
+    title: "Upload",
+    description: "Upload TXT, PDF, or pasted text into a local development storage pipeline.",
+  },
+  {
     href: "/dashboard",
     title: "Dashboard",
     description: "A home base for uploads, recent research activity, and saved findings.",

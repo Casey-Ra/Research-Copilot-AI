@@ -125,6 +125,16 @@ npm run prisma:seed
 
 This structure keeps business logic out of the UI, makes future testing easier, and leaves a clear upgrade path for cloud storage, background jobs, and team workspaces.
 
+## Upload Storage
+
+Phase 4 stores uploaded files through a storage abstraction in [lib/documents/storage.ts](/c:/Users/craws/Documents/Code/Research-Copilot-AI/lib/documents/storage.ts).
+
+- The current implementation writes files to the local filesystem under `UPLOAD_DIR`.
+- Document records only persist the relative `storagePath`, not storage-specific implementation details.
+- Server actions call the storage interface instead of writing files directly from page components.
+
+That separation keeps the upload flow easy to migrate later to S3, Blob storage, or team-scoped buckets.
+
 ## Next Recommended Phase
 
-Phase 1 adds Auth.js / NextAuth, protected routes, an auth-aware shell, and session helpers on top of this foundation.
+Phase 5 adds document parsing and chunking on top of the upload pipeline so `UPLOADED` documents can move through extraction and ingestion.

@@ -9,5 +9,6 @@ coverage
 .env.test.local
 .env.production.local
 *.log
+storage/uploads
 
 Instructions for building Research Co.yaml

@@ -79,6 +79,14 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
             </div>
             <div className="rounded-[1.25rem] bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                File size
+              </p>
+              <p className="mt-2 text-lg font-semibold text-slate-950">
+                {document.fileSizeBytes ? `${Math.max(1, Math.round(document.fileSizeBytes / 1024))} KB` : "-"}
+              </p>
+            </div>
+            <div className="rounded-[1.25rem] bg-slate-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
                 Linked notes
               </p>
               <p className="mt-2 text-lg font-semibold text-slate-950">{document.notes.length}</p>
@@ -92,10 +100,17 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
                 {document.extractedText}
               </p>
             ) : (
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                No extracted text has been saved yet. This is expected until the upload and parsing
-                phases are implemented.
-              </p>
+              <div className="mt-3 space-y-3 text-sm leading-7 text-slate-600">
+                <p>
+                  No extracted text has been saved yet. This is expected until the parsing phase is
+                  implemented.
+                </p>
+                {document.storagePath ? (
+                  <p>
+                    Local storage path: <span className="font-medium text-slate-950">{document.storagePath}</span>
+                  </p>
+                ) : null}
+              </div>
             )}
           </div>
         </section>
