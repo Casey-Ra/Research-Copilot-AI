@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authConfig, shouldRedirectAuthenticatedUser } from "@/lib/auth/config";
 import { DEFAULT_LOGIN_REDIRECT } from "@/lib/auth/constants";
 
 export function resolveCallbackUrl(callbackUrl?: string | null) {
@@ -11,20 +12,29 @@ export function resolveCallbackUrl(callbackUrl?: string | null) {
 }
 
 export async function getCurrentSession() {
-  return auth();
+  return getServerSession(authConfig);
 }
 
 export async function getCurrentUser() {
-  const session = await auth();
+  const session = await getServerSession(authConfig);
   return session?.user ?? null;
 }
 
 export async function requireUser() {
-  const session = await auth();
+  const session = await getServerSession(authConfig);
 
   if (!session?.user) {
     redirect("/sign-in");
   }
 
   return session.user;
+}
+
+export async function redirectAuthenticatedUser(pathname: string) {
+  const session = await getServerSession(authConfig);
+  const target = shouldRedirectAuthenticatedUser(pathname, session);
+
+  if (target) {
+    redirect(target);
+  }
 }

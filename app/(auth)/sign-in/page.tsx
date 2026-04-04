@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { CredentialsSignInForm } from "@/components/auth/CredentialsSignInForm";
+import { GitHubSignInButton } from "@/components/auth/GitHubSignInButton";
 import { authProviderState } from "@/lib/auth/config";
 import { getCurrentSession, resolveCallbackUrl } from "@/lib/auth/session";
-import { signInWithGitHubAction } from "@/lib/auth/actions";
 
 type SignInPageProps = {
   searchParams?: Promise<{
@@ -63,21 +63,15 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
         </div>
 
         {authProviderState.githubConfigured ? (
-          <form action={signInWithGitHubAction} className="space-y-3 rounded-[1.5rem] border border-slate-200 p-5">
-            <input type="hidden" name="callbackUrl" value={callbackUrl} />
+          <div className="space-y-3 rounded-[1.5rem] border border-slate-200 p-5">
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-slate-950">GitHub OAuth</h3>
               <p className="text-sm leading-6 text-slate-600">
                 Production-style sign-in powered by Auth.js with a GitHub provider.
               </p>
             </div>
-            <button
-              type="submit"
-              className="rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
-            >
-              Continue with GitHub
-            </button>
-          </form>
+            <GitHubSignInButton callbackUrl={callbackUrl} />
+          </div>
         ) : (
           <div className="rounded-[1.5rem] border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
             GitHub OAuth is not configured yet. Add `AUTH_GITHUB_ID` and `AUTH_GITHUB_SECRET` to

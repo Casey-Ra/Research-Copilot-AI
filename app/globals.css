@@ -8,14 +8,19 @@
   }
 
   * {
-    @apply border-slate-200;
+    box-sizing: border-box;
   }
 
   body {
-    @apply bg-slate-100 text-slate-950 antialiased;
+    font-family:
+      "Segoe UI", "Aptos", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: rgb(241 245 249);
+    color: rgb(15 23 42);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   a {
-    @apply transition-colors;
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
   }
 }

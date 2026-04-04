@@ -1,6 +1,7 @@
-import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
+import type { NextAuthOptions, Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import { DEFAULT_LOGIN_REDIRECT, PROTECTED_PATH_PREFIXES } from "@/lib/auth/constants";
 
 const githubConfigured =
@@ -9,14 +10,13 @@ const githubConfigured =
 const demoEmail = "demo@researchcopilot.local";
 const demoPassword = "researchcopilot-demo";
 
-export const authConfig = {
-  trustHost: true,
+export const authConfig: NextAuthOptions = {
   secret: process.env.AUTH_SECRET,
   pages: {
     signIn: "/sign-in",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
   providers: [
     ...(githubConfigured
@@ -54,31 +54,25 @@ export const authConfig = {
       : []),
   ],
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = Boolean(auth?.user);
-      const isProtectedRoute = PROTECTED_PATH_PREFIXES.some((prefix) =>
-        nextUrl.pathname.startsWith(prefix),
-      );
-      const isSignInRoute = nextUrl.pathname.startsWith("/sign-in");
-
-      if (isProtectedRoute) {
-        return isLoggedIn;
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
       }
 
-      if (isSignInRoute && isLoggedIn) {
-        return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      if (new URL(url).origin === baseUrl) {
+        return url;
       }
 
-      return true;
+      return baseUrl;
     },
-    jwt({ token, user }) {
+    jwt({ token, user }: { token: JWT; user?: User }) {
       if (user?.id) {
         token.userId = user.id;
       }
 
       return token;
     },
-    session({ session, token }) {
+    session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
         session.user.id = token.userId ?? token.sub ?? "";
       }
@@ -86,7 +80,22 @@ export const authConfig = {
       return session;
     },
   },
-} satisfies NextAuthConfig;
+};
+
+export function isProtectedPath(pathname: string) {
+  return PROTECTED_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+export function shouldRedirectAuthenticatedUser(pathname: string, session: Session | null) {
+  const isLoggedIn = Boolean(session?.user);
+  const isSignInRoute = pathname.startsWith("/sign-in");
+
+  if (isSignInRoute && isLoggedIn) {
+    return DEFAULT_LOGIN_REDIRECT;
+  }
+
+  return null;
+}
 
 export const authProviderState = {
   githubConfigured,

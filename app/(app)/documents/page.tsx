@@ -1,27 +1,47 @@
+import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
-import { PlaceholderCard } from "@/components/PlaceholderCard";
+import { CreateDocumentForm } from "@/components/documents/CreateDocumentForm";
+import { DocumentCard } from "@/components/documents/DocumentCard";
+import { requireUser } from "@/lib/auth/session";
+import { getUserDocuments } from "@/lib/db/documents";
 
-export default function DocumentsPage() {
+export default async function DocumentsPage() {
+  const user = await requireUser();
+  const documents = await getUserDocuments(user.id);
+
   return (
     <div className="space-y-8">
       <PageHeader
         eyebrow="Documents"
-        title="Document management placeholder"
-        description="Uploads, processing states, and document ownership flows will be added in later phases. This route is in place so navigation and layout are stable from the start."
+        title="Manage the research corpus for this workspace"
+        description="This page now shows real user-owned document records from the database and includes a simple draft-create flow until the full upload pipeline lands in the next phase."
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <PlaceholderCard
-          title="Upload pipeline"
-          description="Local development storage and validation will be introduced in the upload phase."
-          status="Planned"
+      <CreateDocumentForm />
+
+      {documents.length === 0 ? (
+        <EmptyState
+          eyebrow="Documents"
+          title="No documents yet"
+          description="Create a draft document above to start populating your workspace. File uploads, storage, and parsing will replace this bridge workflow in the next phases."
         />
-        <PlaceholderCard
-          title="Document detail views"
-          description="Each document will eventually expose extracted text, chunk metadata, summaries, and citation backlinks."
-          status="Planned"
-        />
-      </div>
+      ) : (
+        <div className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
+          {documents.map((document) => (
+            <DocumentCard
+              key={document.id}
+              id={document.id}
+              title={document.title}
+              fileName={document.fileName}
+              fileType={document.fileType}
+              status={document.status}
+              updatedAt={document.updatedAt}
+              chunkCount={document._count.chunks}
+              noteCount={document._count.notes}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

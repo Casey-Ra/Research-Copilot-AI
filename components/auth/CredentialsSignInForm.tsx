@@ -1,37 +1,44 @@
 "use client";
 
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
-import type { CredentialsFormState } from "@/lib/auth/actions";
-import { signInWithDemoAction } from "@/lib/auth/actions";
-
-const initialState: CredentialsFormState = {};
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-    >
-      {pending ? "Signing in..." : "Sign in with demo credentials"}
-    </button>
-  );
-}
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 
 type CredentialsSignInFormProps = {
   callbackUrl: string;
 };
 
 export function CredentialsSignInForm({ callbackUrl }: CredentialsSignInFormProps) {
-  const [state, formAction] = useActionState(signInWithDemoAction, initialState);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function handleSubmit(formData: FormData) {
+    setPending(true);
+    setError(null);
+
+    const result = await signIn("credentials", {
+      email: formData.get("email")?.toString() ?? "",
+      password: formData.get("password")?.toString() ?? "",
+      callbackUrl,
+      redirect: false,
+    });
+
+    setPending(false);
+
+    if (result?.error) {
+      setError("Those demo credentials were not accepted. Double-check the email and password.");
+      return;
+    }
+
+    window.location.href = result?.url ?? callbackUrl;
+  }
 
   return (
-    <form action={formAction} className="space-y-4">
-      <input type="hidden" name="callbackUrl" value={callbackUrl} />
-
+    <form
+      action={async (formData) => {
+        await handleSubmit(formData);
+      }}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium text-slate-700">
           Email
@@ -60,13 +67,19 @@ export function CredentialsSignInForm({ callbackUrl }: CredentialsSignInFormProp
         />
       </div>
 
-      {state.error ? (
+      {error ? (
         <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-          {state.error}
+          {error}
         </p>
       ) : null}
 
-      <SubmitButton />
+      <button
+        type="submit"
+        disabled={pending}
+        className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {pending ? "Signing in..." : "Sign in with demo credentials"}
+      </button>
     </form>
   );
 }

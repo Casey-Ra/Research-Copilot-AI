@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { auth } from "@/lib/auth";
+import { getCurrentSession } from "@/lib/auth/session";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 
 const navLinks = [
@@ -11,7 +11,7 @@ const navLinks = [
 ];
 
 export async function Navbar() {
-  const session = await auth();
+  const session = await getCurrentSession();
   const user = session?.user;
 
   return (
