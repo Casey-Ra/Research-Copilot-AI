@@ -1,5 +1,5 @@
-import OpenAI from "openai";
 import { prisma } from "@/lib/db/prisma";
+import { getOpenAIClient, hasUsableApiKey } from "@/lib/llm/client";
 import { semanticSearchDocuments } from "@/lib/retrieval";
 import type { JsonCitation } from "@/types/database";
 
@@ -19,11 +19,6 @@ export type GroundedAnswerResult = {
   answer: string;
   citations: JsonCitation[];
 };
-
-function hasUsableApiKey() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  return Boolean(apiKey && apiKey !== "replace-me");
-}
 
 function mapRole(role: PersistedChatMessage["role"]) {
   if (role === "ASSISTANT") {
@@ -84,10 +79,7 @@ async function createModelGroundedAnswer(input: {
   citations: JsonCitation[];
   history: PersistedChatMessage[];
 }) {
-  const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_BASE_URL,
-  });
+  const client = getOpenAIClient();
 
   const historyBlock = input.history
     .slice(-6)

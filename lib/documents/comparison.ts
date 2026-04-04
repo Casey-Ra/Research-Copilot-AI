@@ -1,5 +1,5 @@
-import OpenAI from "openai";
 import { prisma } from "@/lib/db/prisma";
+import { getOpenAIClient, hasUsableApiKey } from "@/lib/llm/client";
 import { semanticSearchDocuments } from "@/lib/retrieval";
 import { cosineSimilarity, isNumericVector } from "@/lib/retrieval/vector";
 import { getDocumentSummaryFromMetadata } from "@/lib/documents/metadata";
@@ -103,11 +103,6 @@ export type DocumentComparisonResult = {
     right: number;
   };
 };
-
-function hasUsableApiKey() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  return Boolean(apiKey && apiKey !== "replace-me");
-}
 
 function toSharedEvidenceItem(pair: SharedPair): SharedEvidenceItem {
   return {
@@ -433,10 +428,7 @@ async function buildModelComparisonNarrative(input: {
   uniqueToLeft: ComparisonHighlight[];
   uniqueToRight: ComparisonHighlight[];
 }) {
-  const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_BASE_URL,
-  });
+  const client = getOpenAIClient();
 
   const sharedBlock =
     input.sharedEvidence.length > 0

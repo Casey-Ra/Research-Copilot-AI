@@ -21,9 +21,11 @@ export function formatShortDateTime(value: Date | string) {
   return shortDateTimeFormatter.format(date);
 }
 
+const compactNumberFormatter = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
 export function formatCompactNumber(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(value);
+  return compactNumberFormatter.format(value);
 }

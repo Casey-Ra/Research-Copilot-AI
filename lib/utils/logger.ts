@@ -7,7 +7,7 @@ const levelOrder: Record<LogLevel, number> = {
   debug: 3,
 };
 
-function getConfiguredLevel(): LogLevel {
+const configuredLevel: LogLevel = (() => {
   const configured = process.env.APP_LOG_LEVEL?.toLowerCase();
 
   if (configured === "error" || configured === "warn" || configured === "info" || configured === "debug") {
@@ -15,10 +15,10 @@ function getConfiguredLevel(): LogLevel {
   }
 
   return process.env.NODE_ENV === "production" ? "info" : "debug";
-}
+})();
 
 function shouldLog(level: LogLevel) {
-  return levelOrder[level] <= levelOrder[getConfiguredLevel()];
+  return levelOrder[level] <= levelOrder[configuredLevel];
 }
 
 function formatContext(context?: Record<string, unknown>) {

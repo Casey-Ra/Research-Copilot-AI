@@ -21,5 +21,5 @@ export function cosineSimilarity(a: number[], b: number[]) {
 }
 
 export function isNumericVector(value: unknown): value is number[] {
-  return Array.isArray(value) && value.every((item) => typeof item === "number");
+  return Array.isArray(value) && value.length > 0 && typeof value[0] === "number";
 }

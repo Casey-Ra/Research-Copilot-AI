@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { getOpenAIClient, hasUsableApiKey } from "@/lib/llm/client";
 
 export type EmbeddingModelConfig = {
   model?: string;
@@ -19,11 +19,6 @@ function getEmbeddingConfig(config?: EmbeddingModelConfig) {
   const dimensions = configuredDimensions || undefined;
 
   return { model, dimensions };
-}
-
-function hasUsableApiKey() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  return Boolean(apiKey && apiKey !== "replace-me");
 }
 
 function normalizeVector(vector: number[]) {
@@ -59,10 +54,7 @@ async function generateOpenAIEmbeddings(
   config?: EmbeddingModelConfig,
 ): Promise<EmbeddingBatchResult> {
   const { model, dimensions } = getEmbeddingConfig(config);
-  const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_BASE_URL,
-  });
+  const client = getOpenAIClient();
 
   const response = await client.embeddings.create({
     model,

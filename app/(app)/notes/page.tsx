@@ -37,16 +37,18 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
     (editNoteId && !editableNote
       ? "That note could not be loaded. It may have been deleted or may not belong to this workspace."
       : "");
-  const filteredNotes =
-    activeView === "all" ? notes : notes.filter((note) => getNoteView(note) === activeView);
-  const counts = {
-    all: notes.length,
-    manual: notes.filter((note) => getNoteView(note) === "manual").length,
-    summary: notes.filter((note) => getNoteView(note) === "summary").length,
-    search: notes.filter((note) => getNoteView(note) === "search").length,
-    compare: notes.filter((note) => getNoteView(note) === "compare").length,
-    chat: notes.filter((note) => getNoteView(note) === "chat").length,
-  };
+  const counts = { all: notes.length, manual: 0, summary: 0, search: 0, compare: 0, chat: 0, other: 0 };
+  const filteredNotes: typeof notes = [];
+
+  for (const note of notes) {
+    const view = getNoteView(note);
+    if (view in counts) {
+      counts[view as keyof typeof counts] += 1;
+    }
+    if (activeView === "all" || view === activeView) {
+      filteredNotes.push(note);
+    }
+  }
   const views = [
     { id: "all", label: "All", count: counts.all },
     { id: "manual", label: "Manual", count: counts.manual },

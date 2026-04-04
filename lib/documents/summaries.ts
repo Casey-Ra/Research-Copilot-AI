@@ -1,5 +1,5 @@
-import OpenAI from "openai";
 import { prisma } from "@/lib/db/prisma";
+import { getOpenAIClient, hasUsableApiKey } from "@/lib/llm/client";
 import {
   withDocumentSummaryError,
   withUpdatedDocumentSummary,
@@ -67,11 +67,6 @@ type SummaryDocumentRecord = {
     chunkIndex: number;
   }>;
 };
-
-function hasUsableApiKey() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  return Boolean(apiKey && apiKey !== "replace-me");
-}
 
 function normalizeWhitespace(text: string) {
   return text.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
@@ -234,10 +229,7 @@ async function buildModelSummary(
   summaryType: DocumentSummaryType,
 ): Promise<DocumentSummaryEntry> {
   const source = buildSummarySource(document);
-  const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_BASE_URL,
-  });
+  const client = getOpenAIClient();
 
   const completion = await client.chat.completions.create({
     model: process.env.CHAT_MODEL ?? "gpt-4.1-mini",
