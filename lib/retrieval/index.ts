@@ -9,10 +9,17 @@ export type RetrievalResult = {
   documentId: string;
   documentTitle: string;
   fileName: string;
+  fileType: string;
   text: string;
   pageNumber: number | null;
   startOffset: number | null;
   endOffset: number | null;
+  updatedAt: Date;
+};
+
+export type SemanticSearchResponse = {
+  results: RetrievalResult[];
+  totalCandidates: number;
 };
 
 function cosineSimilarity(a: number[], b: number[]) {
@@ -45,12 +52,17 @@ export async function semanticSearchDocuments(input: {
   userId: string;
   query: string;
   documentIds?: string[];
+  fileTypes?: string[];
+  updatedAfter?: Date | null;
   limit?: number;
-}) {
+}): Promise<SemanticSearchResponse> {
   const query = input.query.trim();
 
   if (!query) {
-    return [] as RetrievalResult[];
+    return {
+      results: [],
+      totalCandidates: 0,
+    };
   }
 
   const queryEmbedding = await generateQueryEmbedding(query);
@@ -62,6 +74,10 @@ export async function semanticSearchDocuments(input: {
         ...(input.documentIds && input.documentIds.length > 0
           ? { id: { in: input.documentIds } }
           : {}),
+        ...(input.fileTypes && input.fileTypes.length > 0
+          ? { fileType: { in: input.fileTypes } }
+          : {}),
+        ...(input.updatedAfter ? { updatedAt: { gte: input.updatedAfter } } : {}),
       },
     },
     select: {
@@ -76,6 +92,8 @@ export async function semanticSearchDocuments(input: {
         select: {
           title: true,
           fileName: true,
+          fileType: true,
+          updatedAt: true,
         },
       },
     },
@@ -95,15 +113,20 @@ export async function semanticSearchDocuments(input: {
         documentId: chunk.documentId,
         documentTitle: chunk.document.title,
         fileName: chunk.document.fileName,
+        fileType: chunk.document.fileType,
         text: chunk.text,
         pageNumber: chunk.pageNumber,
         startOffset: chunk.startOffset,
         endOffset: chunk.endOffset,
+        updatedAt: chunk.document.updatedAt,
       } satisfies RetrievalResult;
     })
     .filter((result): result is RetrievalResult => Boolean(result))
     .sort((left, right) => right.score - left.score)
     .slice(0, input.limit ?? 8);
 
-  return ranked;
+  return {
+    results: ranked,
+    totalCandidates: candidateChunks.length,
+  };
 }

@@ -13,6 +13,7 @@ export async function getReadyDocumentsForUser(userId: string) {
       id: true,
       title: true,
       fileName: true,
+      fileType: true,
       updatedAt: true,
       _count: {
         select: {
