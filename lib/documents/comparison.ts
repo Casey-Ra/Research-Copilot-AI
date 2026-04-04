@@ -36,6 +36,26 @@ type SharedPair = {
   right: CompareChunk;
 };
 
+type SharedEvidenceItem = {
+  score: number;
+  left: {
+    id: string;
+    chunkIndex: number;
+    text: string;
+    pageNumber: number | null;
+    startOffset: number | null;
+    endOffset: number | null;
+  };
+  right: {
+    id: string;
+    chunkIndex: number;
+    text: string;
+    pageNumber: number | null;
+    startOffset: number | null;
+    endOffset: number | null;
+  };
+};
+
 type ComparisonHighlight = {
   chunkId: string;
   chunkIndex: number;
@@ -67,7 +87,7 @@ export type DocumentComparisonResult = {
   similarityLabel: "low" | "moderate" | "high";
   focusQuery: string | null;
   comparisonNarrative: string;
-  sharedEvidence: SharedPair[];
+  sharedEvidence: SharedEvidenceItem[];
   uniqueToLeft: ComparisonHighlight[];
   uniqueToRight: ComparisonHighlight[];
   comparedChunkCount: {
@@ -79,6 +99,28 @@ export type DocumentComparisonResult = {
 function hasUsableApiKey() {
   const apiKey = process.env.OPENAI_API_KEY;
   return Boolean(apiKey && apiKey !== "replace-me");
+}
+
+function toSharedEvidenceItem(pair: SharedPair): SharedEvidenceItem {
+  return {
+    score: pair.score,
+    left: {
+      id: pair.left.id,
+      chunkIndex: pair.left.chunkIndex,
+      text: truncateText(pair.left.text),
+      pageNumber: pair.left.pageNumber,
+      startOffset: pair.left.startOffset,
+      endOffset: pair.left.endOffset,
+    },
+    right: {
+      id: pair.right.id,
+      chunkIndex: pair.right.chunkIndex,
+      text: truncateText(pair.right.text),
+      pageNumber: pair.right.pageNumber,
+      startOffset: pair.right.startOffset,
+      endOffset: pair.right.endOffset,
+    },
+  };
 }
 
 function truncateText(text: string, limit = 240) {
@@ -475,17 +517,7 @@ export async function compareDocumentsForUser(input: {
     similarityLabel,
     focusQuery,
     comparisonNarrative,
-    sharedEvidence: sharedEvidence.map((pair) => ({
-      ...pair,
-      left: {
-        ...pair.left,
-        text: truncateText(pair.left.text),
-      },
-      right: {
-        ...pair.right,
-        text: truncateText(pair.right.text),
-      },
-    })),
+    sharedEvidence: sharedEvidence.map(toSharedEvidenceItem),
     uniqueToLeft,
     uniqueToRight,
     comparedChunkCount: {

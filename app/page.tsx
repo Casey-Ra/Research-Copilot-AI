@@ -24,7 +24,7 @@ const sections = [
   {
     href: "/search",
     title: "Semantic Search",
-    description: "Search across document chunks with future-ready retrieval abstractions.",
+    description: "Search processed document chunks with semantic ranking, filters, and saveable findings.",
   },
   {
     href: "/chat",
@@ -44,16 +44,16 @@ export default function HomePage() {
       <section className="grid gap-8 rounded-[2rem] border border-white/10 bg-slate-950/80 p-8 text-slate-50 shadow-[0_30px_80px_rgba(2,12,27,0.28)] backdrop-blur sm:p-12 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-6">
           <p className="inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200">
-            Phase 0 Foundation
+            Research Workspace
           </p>
           <div className="space-y-4">
             <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-              Research Copilot AI starts with a clean, extensible document intelligence foundation.
+              Research Copilot AI turns uploaded documents into a grounded research workspace.
             </h1>
             <p className="max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
-              This starter phase sets up the app shell, placeholder workflows, Prisma scaffolding,
-              and service boundaries for authentication, document parsing, retrieval, and LLM
-              features.
+              Upload files, process them into chunks, search semantically, ask grounded questions,
+              compare documents, generate summaries, and save the strongest findings as reusable
+              notes.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -61,13 +61,13 @@ export default function HomePage() {
               href="/dashboard"
               className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
             >
-              Explore app shell
+              Open dashboard
             </Link>
             <Link
-              href="/documents"
+              href="/upload"
               className="rounded-full border border-slate-700 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-900"
             >
-              View placeholder routes
+              Upload a document
             </Link>
           </div>
         </div>
@@ -79,8 +79,8 @@ export default function HomePage() {
             </p>
             <ul className="mt-4 space-y-3 text-sm text-slate-200">
               <li>Typed service boundaries between UI, DB, parsing, retrieval, and LLM logic.</li>
-              <li>Prisma and Postgres scaffolding ready before feature work begins.</li>
-              <li>Placeholder routes that make later feature phases easy to layer in.</li>
+              <li>Grounded document workflows with summaries, comparison, search, and chat.</li>
+              <li>Notes that preserve useful artifacts from the rest of the product.</li>
             </ul>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function HomePage() {
             App Sections
           </p>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-            Foundation routes for every core workflow
+            Core workflows in the product
           </h2>
         </div>
 
@@ -105,7 +105,7 @@ export default function HomePage() {
             >
               <div className="space-y-3">
                 <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                  Placeholder route
+                  Workspace route
                 </div>
                 <h3 className="text-xl font-semibold text-slate-950">{section.title}</h3>
                 <p className="text-sm leading-6 text-slate-600">{section.description}</p>

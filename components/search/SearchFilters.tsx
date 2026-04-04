@@ -33,8 +33,8 @@ export function SearchFilters({
           Search across embedded document chunks
         </h2>
         <p className="text-sm leading-7 text-slate-600">
-          This is a thin Phase 6 verification UI for the retrieval layer. The fuller search
-        experience can still be polished in the next dedicated phase.
+          Search processed documents semantically, narrow the scope with filters, and save strong
+          hits into notes when you find something worth keeping.
         </p>
       </div>
 

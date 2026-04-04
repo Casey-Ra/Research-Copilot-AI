@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
+import { upsertNoteForUserBySource } from "@/lib/db/notes";
 import { requireUser } from "@/lib/auth/session";
 import { ingestDocumentForUser } from "@/lib/documents/ingestion";
 import { getDocumentSummaryFromMetadata } from "@/lib/documents/metadata";
@@ -172,42 +173,15 @@ export async function saveDocumentSummaryToNoteAction(
 
   const summaryConfig = getSummaryConfig(summaryType);
   const sourceId = `document-summary:${document.id}:${summaryType}`;
-  const existingNote = await prisma.note.findFirst({
-    where: {
-      userId: user.id,
-      sourceType: "SUMMARY",
-      sourceId,
-    },
-    select: {
-      id: true,
-    },
+  await upsertNoteForUserBySource({
+    userId: user.id,
+    sourceId,
+    sourceType: "SUMMARY",
+    title: `${document.title} - ${summaryConfig.noteTitle}`,
+    content: summary.content,
+    documentId: document.id,
+    tags: ["summary", summaryType],
   });
-
-  if (existingNote) {
-    await prisma.note.update({
-      where: {
-        id: existingNote.id,
-      },
-      data: {
-        title: `${document.title} - ${summaryConfig.noteTitle}`,
-        content: summary.content,
-        documentId: document.id,
-        tags: ["summary", summaryType],
-      },
-    });
-  } else {
-    await prisma.note.create({
-      data: {
-        userId: user.id,
-        documentId: document.id,
-        title: `${document.title} - ${summaryConfig.noteTitle}`,
-        content: summary.content,
-        sourceType: "SUMMARY",
-        sourceId,
-        tags: ["summary", summaryType],
-      },
-    });
-  }
 
   revalidatePath("/dashboard");
   revalidatePath("/documents");

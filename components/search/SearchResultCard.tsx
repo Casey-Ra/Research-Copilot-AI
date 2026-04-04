@@ -93,15 +93,8 @@ export function SearchResultCard({ rank, query, result }: SearchResultCardProps)
             input={{
               chunkId: result.chunkId,
               documentId: result.documentId,
-              documentTitle: result.documentTitle,
-              fileName: result.fileName,
-              fileType: result.fileType,
               query,
               score: result.score,
-              text: result.text,
-              pageNumber: result.pageNumber,
-              startOffset: result.startOffset,
-              endOffset: result.endOffset,
             }}
           />
           <Link

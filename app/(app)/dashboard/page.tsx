@@ -32,17 +32,17 @@ export default async function DashboardPage() {
         <MetricCard
           label="Ready docs"
           value={snapshot.readyDocumentCount}
-          description="Documents already in a ready state for future retrieval and summaries."
+          description="Documents already processed and available for search, comparison, summaries, and chat."
         />
         <MetricCard
           label="Chat sessions"
           value={snapshot.chatSessionCount}
-          description="Saved conversation threads that will later power grounded chat workflows."
+          description="Saved grounded conversations tied back to the user's document workspace."
         />
         <MetricCard
           label="Notes"
           value={snapshot.noteCount}
-          description="Persistent findings captured from research work and future assistant outputs."
+          description="Persistent findings captured from summaries, search, comparison, and chat."
         />
       </div>
 
@@ -87,9 +87,9 @@ export default async function DashboardPage() {
           />
           <ActivitySection
             title="Recent chats"
-            description="Conversation threads created in the workspace and ready for future chat UX."
+            description="Conversation threads created in the workspace for grounded document Q&A."
             emptyTitle="No chat sessions yet"
-            emptyDescription="Chat history will appear once the grounded Q&A workflow is implemented."
+            emptyDescription="Ask a grounded question in chat to start building conversation history."
             items={activity.chatSessions.map((chat) => ({
               id: chat.id,
               title: chat.title,
@@ -103,7 +103,7 @@ export default async function DashboardPage() {
         <EmptyState
           eyebrow="Workspace activity"
           title="Your dashboard is ready for real data"
-          description="The data pipeline is working. Create a draft document from the documents page to populate your first dashboard cards and recent activity lists."
+          description="Upload and process a document to start populating dashboard cards, search results, comparisons, and saved notes."
           actionLabel="Open documents"
           actionHref="/documents"
         />

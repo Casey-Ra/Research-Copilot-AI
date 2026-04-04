@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
+import { upsertNoteForUserBySource } from "@/lib/db/notes";
 import { requireUser } from "@/lib/auth/session";
 import { compareDocumentsForUser } from "@/lib/documents/comparison";
 
@@ -29,15 +30,8 @@ function buildSearchLocation(input: {
 export async function saveSearchResultNoteAction(input: {
   chunkId: string;
   documentId: string;
-  documentTitle: string;
-  fileName: string;
-  fileType: string;
   query: string;
   score: number;
-  text: string;
-  pageNumber?: number | null;
-  startOffset?: number | null;
-  endOffset?: number | null;
 }) {
   const user = await requireUser();
 
@@ -84,40 +78,15 @@ export async function saveSearchResultNoteAction(input: {
     chunk.text,
   ].join("\n");
 
-  const existingNote = await prisma.note.findFirst({
-    where: {
-      userId: user.id,
-      sourceId,
-    },
-    select: {
-      id: true,
-    },
+  await upsertNoteForUserBySource({
+    userId: user.id,
+    sourceId,
+    sourceType: "DOCUMENT",
+    title,
+    content,
+    documentId: chunk.document.id,
+    tags: ["search", "document-evidence", normalizedQuery || "search-result"],
   });
-
-  if (existingNote) {
-    await prisma.note.update({
-      where: { id: existingNote.id },
-      data: {
-        title,
-        content,
-        documentId: chunk.document.id,
-        sourceType: "DOCUMENT",
-        tags: ["search", "document-evidence", normalizedQuery || "search-result"],
-      },
-    });
-  } else {
-    await prisma.note.create({
-      data: {
-        userId: user.id,
-        documentId: chunk.document.id,
-        title,
-        content,
-        sourceType: "DOCUMENT",
-        sourceId,
-        tags: ["search", "document-evidence", normalizedQuery || "search-result"],
-      },
-    });
-  }
 
   revalidatePath("/dashboard");
   revalidatePath("/search");
@@ -177,40 +146,15 @@ export async function saveComparisonNoteAction(input: {
     uniqueRightBlock,
   ].join("\n");
 
-  const existingNote = await prisma.note.findFirst({
-    where: {
-      userId: user.id,
-      sourceId,
-    },
-    select: {
-      id: true,
-    },
+  await upsertNoteForUserBySource({
+    userId: user.id,
+    sourceId,
+    sourceType: "DOCUMENT",
+    title,
+    content,
+    documentId: comparison.leftDocument.id,
+    tags: ["compare", normalizedFocus || "overall-comparison"],
   });
-
-  if (existingNote) {
-    await prisma.note.update({
-      where: { id: existingNote.id },
-      data: {
-        title,
-        content,
-        documentId: comparison.leftDocument.id,
-        sourceType: "DOCUMENT",
-        tags: ["compare", normalizedFocus || "overall-comparison"],
-      },
-    });
-  } else {
-    await prisma.note.create({
-      data: {
-        userId: user.id,
-        documentId: comparison.leftDocument.id,
-        title,
-        content,
-        sourceType: "DOCUMENT",
-        sourceId,
-        tags: ["compare", normalizedFocus || "overall-comparison"],
-      },
-    });
-  }
 
   revalidatePath("/dashboard");
   revalidatePath("/compare");

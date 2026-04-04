@@ -4,15 +4,8 @@ type SaveSearchNoteButtonProps = {
   input: {
     chunkId: string;
     documentId: string;
-    documentTitle: string;
-    fileName: string;
-    fileType: string;
     query: string;
     score: number;
-    text: string;
-    pageNumber?: number | null;
-    startOffset?: number | null;
-    endOffset?: number | null;
   };
 };
 

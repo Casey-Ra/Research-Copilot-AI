@@ -11,8 +11,8 @@ export default function UnauthorizedPage() {
           You do not have access to this area.
         </h1>
         <p className="text-sm leading-7 text-slate-600">
-          This route is reserved for future ownership and authorization failures that are different
-          from simply being signed out.
+          This request could not be authorized for the current session. Sign in again or return to a
+          workspace route you already have access to.
         </p>
       </div>
 

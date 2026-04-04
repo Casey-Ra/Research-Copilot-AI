@@ -2,19 +2,19 @@
 
 Research Copilot AI is a production-style portfolio project for document intelligence workflows. The app will let users upload documents, search them semantically, ask grounded questions with citations, generate summaries, compare documents, and save findings as notes.
 
-## Phase 0 Scope
+## Current Scope
 
-This repository currently contains the clean foundation for the product:
+The repository now includes a working end-to-end local MVP:
 
-- Next.js App Router with TypeScript
-- Tailwind CSS project styling
-- Shared layout and navigation
-- Placeholder routes for the core app sections
-- Prisma and PostgreSQL scaffolding
-- Service boundaries for auth, documents, embeddings, retrieval, and LLM orchestration
-- Local environment variable template
-
-Advanced product logic is intentionally deferred until later phases.
+- Auth.js-protected workspace routes
+- Local document upload and storage
+- Text extraction and chunking
+- Embeddings with OpenAI-compatible support and local fallback
+- Semantic search with filters
+- Grounded chat with citations
+- Document summaries
+- Document comparison
+- Saved notes from summaries, search findings, comparison outputs, and chat-ready note infrastructure
 
 ## Tech Stack
 
@@ -32,11 +32,7 @@ Advanced product logic is intentionally deferred until later phases.
 ```text
 app/
   (auth)/
-  dashboard/
-  documents/
-  search/
-  chat/
-  notes/
+  (app)/
 components/
 lib/
   auth/
@@ -72,7 +68,19 @@ cp .env.example .env
 npx prisma generate
 ```
 
-5. Start the development server.
+5. Apply the database migration.
+
+```bash
+npx prisma migrate dev
+```
+
+6. Seed demo data.
+
+```bash
+npm run prisma:seed
+```
+
+7. Start the development server.
 
 ```bash
 npm run dev
@@ -97,8 +105,8 @@ The Prisma schema now includes the core Auth.js models and the MVP product model
 A lightweight development seed lives in [prisma/seed.ts](/c:/Users/craws/Documents/Code/Research-Copilot-AI/prisma/seed.ts). It creates:
 
 - a demo user
-- one ready document
-- two document chunks
+- two ready documents with overlapping and distinct evidence
+- seeded document chunks with embeddings
 - one chat session with sample messages
 - one note linked back to the assistant message
 
@@ -112,7 +120,7 @@ npm run prisma:seed
 
 - Every product model is user-owned directly or indirectly to support strict data isolation.
 - `Document.status` is an enum so the upload and ingestion pipeline can evolve without string drift.
-- `DocumentChunk.embedding` is currently stored as `Json` to keep setup practical before the vector-search phase.
+- `DocumentChunk.embedding` is currently stored as `Json` to keep setup practical while the retrieval layer remains database-agnostic.
 - `Note` supports both generic source tracking (`sourceType`, `sourceId`) and optional direct relations to documents or chat messages.
 
 ## Architecture Choices
@@ -120,7 +128,7 @@ npm run prisma:seed
 - `app/` owns route-level UI and presentation concerns.
 - `components/` holds reusable visual building blocks such as the navbar and page scaffolding.
 - `lib/db` owns database setup so Prisma usage stays out of page components.
-- `lib/auth`, `lib/documents`, `lib/embeddings`, `lib/retrieval`, and `lib/llm` define clear service boundaries before feature logic is added.
+- `lib/auth`, `lib/documents`, `lib/embeddings`, `lib/retrieval`, `lib/llm`, and `lib/notes` keep feature logic separated by concern.
 - `types/` is reserved for shared TypeScript types that should not live inside UI or service modules.
 
 This structure keeps business logic out of the UI, makes future testing easier, and leaves a clear upgrade path for cloud storage, background jobs, and team workspaces.
@@ -134,7 +142,3 @@ Phase 4 stores uploaded files through a storage abstraction in [lib/documents/st
 - Server actions call the storage interface instead of writing files directly from page components.
 
 That separation keeps the upload flow easy to migrate later to S3, Blob storage, or team-scoped buckets.
-
-## Next Recommended Phase
-
-Phase 5 adds document parsing and chunking on top of the upload pipeline so `UPLOADED` documents can move through extraction and ingestion.
