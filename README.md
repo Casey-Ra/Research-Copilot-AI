@@ -14,7 +14,7 @@ The repository now includes a working end-to-end local MVP:
 - Grounded chat with citations
 - Document summaries
 - Document comparison
-- Saved notes from summaries, search findings, comparison outputs, and chat-ready note infrastructure
+- Saved notes from summaries, search findings, comparison outputs, chat answers, and manual entry
 
 ## Tech Stack
 

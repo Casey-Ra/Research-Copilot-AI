@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DeleteDocumentButton } from "@/components/documents/DeleteDocumentButton";
 import { SummaryCard } from "@/components/documents/SummaryCard";
@@ -223,6 +224,18 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
                 documentId={document.id}
                 label={document.status === "FAILED" ? "Retry processing" : "Reprocess document"}
               />
+              <Link
+                href={`/search?documentId=${document.id}`}
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Search this document
+              </Link>
+              <Link
+                href={`/chat?documentId=${document.id}`}
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Ask about this document
+              </Link>
               <DeleteDocumentButton documentId={document.id} />
             </div>
           </section>

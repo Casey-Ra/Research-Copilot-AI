@@ -1,9 +1,11 @@
 import { CitationList } from "@/components/chat/CitationList";
+import { SaveChatNoteButton } from "@/components/chat/SaveChatNoteButton";
 import { formatShortDateTime } from "@/lib/utils/format";
 import type { JsonCitation } from "@/types/database";
 import { cn } from "@/lib/utils/cn";
 
 type ChatMessageCardProps = {
+  id: string;
   role: "USER" | "ASSISTANT" | "SYSTEM";
   content: string;
   createdAt: Date;
@@ -11,6 +13,7 @@ type ChatMessageCardProps = {
 };
 
 export function ChatMessageCard({
+  id,
   role,
   content,
   createdAt,
@@ -35,6 +38,12 @@ export function ChatMessageCard({
       </div>
 
       <div className="mt-4 whitespace-pre-wrap text-sm leading-7 text-slate-800">{content}</div>
+
+      {isAssistant ? (
+        <div className="mt-4 flex flex-wrap gap-3">
+          <SaveChatNoteButton messageId={id} />
+        </div>
+      ) : null}
 
       {isAssistant ? <CitationList citations={citations} /> : null}
     </article>

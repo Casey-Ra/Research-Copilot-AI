@@ -16,6 +16,10 @@ export function getNoteTags(value: unknown) {
 export function getNoteView(note: NotePresentationInput) {
   const tags = getNoteTags(note.tags);
 
+  if (note.sourceType === "MANUAL") {
+    return "manual";
+  }
+
   if (tags.includes("compare")) {
     return "compare";
   }
@@ -40,6 +44,10 @@ export function getNoteSourceLabel(note: NotePresentationInput) {
 
   if (view === "compare") {
     return "comparison note";
+  }
+
+  if (view === "manual") {
+    return "manual note";
   }
 
   if (view === "search") {

@@ -66,6 +66,13 @@ type ComparisonHighlight = {
   uniquenessScore: number;
 };
 
+type PossibleContradiction = {
+  score: number;
+  reason: string;
+  left: SharedEvidenceItem["left"];
+  right: SharedEvidenceItem["right"];
+};
+
 export type DocumentComparisonResult = {
   leftDocument: {
     id: string;
@@ -88,6 +95,7 @@ export type DocumentComparisonResult = {
   focusQuery: string | null;
   comparisonNarrative: string;
   sharedEvidence: SharedEvidenceItem[];
+  possibleContradictions: PossibleContradiction[];
   uniqueToLeft: ComparisonHighlight[];
   uniqueToRight: ComparisonHighlight[];
   comparedChunkCount: {
@@ -143,6 +151,44 @@ function getSimilarityLabel(score: number): "low" | "moderate" | "high" {
   }
 
   return "low";
+}
+
+function significantTerms(text: string) {
+  return Array.from(
+    new Set(
+      text
+        .toLowerCase()
+        .match(/[a-z0-9]+/g)
+        ?.filter((term) => term.length > 4) ?? [],
+    ),
+  );
+}
+
+function hasNegationSignal(text: string) {
+  return /\b(no|not|never|without|lack|avoid|against|cannot|can't|won't|fails?)\b/i.test(text);
+}
+
+function buildPossibleContradictions(sharedEvidence: SharedEvidenceItem[]) {
+  return sharedEvidence
+    .map((pair) => {
+      const leftTerms = significantTerms(pair.left.text);
+      const rightTerms = significantTerms(pair.right.text);
+      const overlappingTerms = leftTerms.filter((term) => rightTerms.includes(term));
+      const negationMismatch = hasNegationSignal(pair.left.text) !== hasNegationSignal(pair.right.text);
+
+      if (!negationMismatch || overlappingTerms.length < 2) {
+        return null;
+      }
+
+      return {
+        score: pair.score,
+        reason: `Both excerpts discuss ${overlappingTerms.slice(0, 3).join(", ")}, but one uses negation language while the other does not.`,
+        left: pair.left,
+        right: pair.right,
+      } satisfies PossibleContradiction;
+    })
+    .filter((item): item is PossibleContradiction => Boolean(item))
+    .slice(0, 2);
 }
 
 function averageVectors(vectors: number[][]) {
@@ -494,6 +540,8 @@ export async function compareDocumentsForUser(input: {
         uniqueToLeft,
         uniqueToRight,
       });
+  const normalizedSharedEvidence = sharedEvidence.map(toSharedEvidenceItem);
+  const possibleContradictions = buildPossibleContradictions(normalizedSharedEvidence);
 
   return {
     leftDocument: {
@@ -517,7 +565,8 @@ export async function compareDocumentsForUser(input: {
     similarityLabel,
     focusQuery,
     comparisonNarrative,
-    sharedEvidence: sharedEvidence.map(toSharedEvidenceItem),
+    sharedEvidence: normalizedSharedEvidence,
+    possibleContradictions,
     uniqueToLeft,
     uniqueToRight,
     comparedChunkCount: {

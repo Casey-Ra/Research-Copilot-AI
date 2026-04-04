@@ -27,6 +27,85 @@ function buildSearchLocation(input: {
   return "Location unavailable";
 }
 
+function normalizeNoteTags(value: string) {
+  return value
+    .split(",")
+    .map((tag) => tag.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function normalizeEntry(value: FormDataEntryValue | null) {
+  return value?.toString().trim() ?? "";
+}
+
+export async function createManualNoteAction(formData: FormData) {
+  const user = await requireUser();
+  const title = normalizeEntry(formData.get("title"));
+  const content = normalizeEntry(formData.get("content"));
+  const tags = normalizeNoteTags(normalizeEntry(formData.get("tags")));
+
+  if (!title || !content) {
+    redirect("/notes");
+  }
+
+  await prisma.note.create({
+    data: {
+      userId: user.id,
+      title,
+      content,
+      sourceType: "MANUAL",
+      tags,
+    },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/notes");
+  redirect("/notes");
+}
+
+export async function updateNoteAction(noteId: string, formData: FormData) {
+  const user = await requireUser();
+  const title = normalizeEntry(formData.get("title"));
+  const content = normalizeEntry(formData.get("content"));
+  const tags = normalizeNoteTags(normalizeEntry(formData.get("tags")));
+
+  if (!title || !content) {
+    redirect(`/notes?edit=${noteId}`);
+  }
+
+  await prisma.note.updateMany({
+    where: {
+      id: noteId,
+      userId: user.id,
+    },
+    data: {
+      title,
+      content,
+      tags,
+      updatedAt: new Date(),
+    },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/notes");
+  redirect("/notes");
+}
+
+export async function deleteNoteAction(noteId: string) {
+  const user = await requireUser();
+
+  await prisma.note.deleteMany({
+    where: {
+      id: noteId,
+      userId: user.id,
+    },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/notes");
+  redirect("/notes");
+}
+
 export async function saveSearchResultNoteAction(input: {
   chunkId: string;
   documentId: string;
@@ -160,4 +239,46 @@ export async function saveComparisonNoteAction(input: {
   revalidatePath("/compare");
   revalidatePath("/notes");
   redirect("/notes");
+}
+
+export async function saveChatMessageNoteAction(chatMessageId: string) {
+  const user = await requireUser();
+  const message = await prisma.chatMessage.findFirst({
+    where: {
+      id: chatMessageId,
+      role: "ASSISTANT",
+      chatSession: {
+        userId: user.id,
+      },
+    },
+    select: {
+      id: true,
+      content: true,
+      chatSession: {
+        select: {
+          title: true,
+          userId: true,
+        },
+      },
+    },
+  });
+
+  if (!message) {
+    redirect("/chat");
+  }
+
+  await upsertNoteForUserBySource({
+    userId: user.id,
+    sourceId: `chat-message:${message.id}`,
+    sourceType: "CHAT_MESSAGE",
+    title: `${message.chatSession.title} - Chat answer`,
+    content: message.content,
+    chatMessageId: message.id,
+    tags: ["chat", "grounded-answer"],
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/chat");
+  revalidatePath("/notes");
+  redirect("/notes?view=chat");
 }

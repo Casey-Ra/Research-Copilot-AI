@@ -25,7 +25,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
       <section className="rounded-[2rem] border border-white/10 bg-slate-950/85 p-8 text-slate-50 shadow-[0_30px_80px_rgba(2,12,27,0.28)] backdrop-blur sm:p-10">
         <div className="space-y-6">
           <p className="inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-            Phase 1 Authentication
+            Protected access
           </p>
           <div className="space-y-4">
             <h1 className="text-4xl font-semibold tracking-tight">
@@ -33,8 +33,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </h1>
             <p className="max-w-xl text-base leading-7 text-slate-300">
               Protected app routes now require an authenticated session. Use GitHub if you have
-              OAuth credentials configured, or use the clearly marked local demo login while we are
-              still in the early build phases.
+              OAuth credentials configured, or use the clearly marked local demo login for local
+              development.
             </p>
           </div>
 
@@ -84,8 +84,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-slate-950">Local demo credentials</h3>
               <p className="text-sm leading-6 text-slate-600">
-                Temporary development-only fallback for early project phases. This is clearly marked
-                so we can remove it later if you want only provider-based auth.
+                Temporary development-only fallback that keeps local setup practical when OAuth is
+                not configured.
               </p>
             </div>
 

@@ -23,6 +23,30 @@ export async function getNotesForUser(userId: string) {
   });
 }
 
+export async function getNoteByIdForUser(noteId: string, userId: string) {
+  return prisma.note.findFirst({
+    where: {
+      id: noteId,
+      userId,
+    },
+    include: {
+      document: {
+        select: {
+          id: true,
+          title: true,
+          fileName: true,
+        },
+      },
+      chatMessage: {
+        select: {
+          id: true,
+          role: true,
+        },
+      },
+    },
+  });
+}
+
 export async function upsertNoteForUserBySource(input: {
   userId: string;
   sourceId: string;

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import type { NoteSourceType } from "@prisma/client";
 import { formatShortDateTime } from "@/lib/utils/format";
@@ -9,6 +10,7 @@ type NoteCardProps = {
   sourceLabel?: string;
   tags?: string[];
   updatedAt: Date;
+  actions?: ReactNode;
   document?: {
     id: string;
     title: string;
@@ -27,6 +29,7 @@ export function NoteCard({
   sourceLabel,
   tags,
   updatedAt,
+  actions,
   document,
 }: NoteCardProps) {
   return (
@@ -60,17 +63,27 @@ export function NoteCard({
         <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">{content}</p>
       </div>
 
-      {document ? (
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <div className="text-sm text-slate-600">
-            Source document: <span className="font-medium text-slate-950">{document.title}</span>
+      {document || actions ? (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          {document ? (
+            <div className="text-sm text-slate-600">
+              Source document: <span className="font-medium text-slate-950">{document.title}</span>
+            </div>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex flex-wrap items-center gap-3">
+            {actions}
+            {document ? (
+              <Link
+                href={`/documents/${document.id}`}
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Open document
+              </Link>
+            ) : null}
           </div>
-          <Link
-            href={`/documents/${document.id}`}
-            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-          >
-            Open document
-          </Link>
         </div>
       ) : null}
     </article>

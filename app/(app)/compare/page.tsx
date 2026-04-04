@@ -2,6 +2,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
 import { CompareFilters } from "@/components/compare/CompareFilters";
 import { ComparisonOverview } from "@/components/compare/ComparisonOverview";
+import { PossibleContradictionsPanel } from "@/components/compare/PossibleContradictionsPanel";
 import { SharedEvidenceCard } from "@/components/compare/SharedEvidenceCard";
 import { UniqueEvidencePanel } from "@/components/compare/UniqueEvidencePanel";
 import { requireUser } from "@/lib/auth/session";
@@ -128,6 +129,12 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                   </div>
                 )}
               </section>
+
+              <PossibleContradictionsPanel
+                items={comparison.possibleContradictions}
+                leftTitle={comparison.leftDocument.title}
+                rightTitle={comparison.rightDocument.title}
+              />
 
               <div className="grid gap-6 xl:grid-cols-2">
                 <UniqueEvidencePanel

@@ -39,6 +39,7 @@ export function ChatConversation({ sessionTitle, messages }: ChatConversationPro
           {messages.map((message) => (
             <ChatMessageCard
               key={message.id}
+              id={message.id}
               role={message.role}
               content={message.content}
               createdAt={message.createdAt}

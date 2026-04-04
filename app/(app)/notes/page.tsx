@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
+import { DeleteNoteButton } from "@/components/notes/DeleteNoteButton";
+import { NoteEditorForm } from "@/components/notes/NoteEditorForm";
 import { NoteCard } from "@/components/notes/NoteCard";
 import { requireUser } from "@/lib/auth/session";
-import { getNotesForUser } from "@/lib/db/notes";
+import { getNoteByIdForUser, getNotesForUser } from "@/lib/db/notes";
 import {
   getNoteSourceLabel,
   getNoteTags,
@@ -13,6 +15,7 @@ import {
 type NotesPageProps = {
   searchParams?: Promise<{
     view?: string;
+    edit?: string;
   }>;
 };
 
@@ -20,11 +23,16 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
   const user = await requireUser();
   const params = searchParams ? await searchParams : undefined;
   const activeView = params?.view ?? "all";
-  const notes = await getNotesForUser(user.id);
+  const editNoteId = params?.edit?.trim() ?? "";
+  const [notes, editableNote] = await Promise.all([
+    getNotesForUser(user.id),
+    editNoteId ? getNoteByIdForUser(editNoteId, user.id) : Promise.resolve(null),
+  ]);
   const filteredNotes =
     activeView === "all" ? notes : notes.filter((note) => getNoteView(note) === activeView);
   const counts = {
     all: notes.length,
+    manual: notes.filter((note) => getNoteView(note) === "manual").length,
     summary: notes.filter((note) => getNoteView(note) === "summary").length,
     search: notes.filter((note) => getNoteView(note) === "search").length,
     compare: notes.filter((note) => getNoteView(note) === "compare").length,
@@ -32,6 +40,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
   };
   const views = [
     { id: "all", label: "All", count: counts.all },
+    { id: "manual", label: "Manual", count: counts.manual },
     { id: "summary", label: "Summaries", count: counts.summary },
     { id: "search", label: "Search", count: counts.search },
     { id: "compare", label: "Compare", count: counts.compare },
@@ -45,6 +54,38 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         title="Saved findings and reusable outputs"
         description="This notes workspace now stores durable research artifacts from summaries, search, comparison, and grounded chat. It acts as the persistent layer for discoveries made elsewhere in the product."
       />
+
+      <div className="grid gap-6 xl:grid-cols-[0.42fr_0.58fr]">
+        <NoteEditorForm mode="create" />
+
+        {editableNote ? (
+          <NoteEditorForm
+            mode="edit"
+            note={{
+              id: editableNote.id,
+              title: editableNote.title,
+              content: editableNote.content,
+              tags: getNoteTags(editableNote.tags),
+            }}
+            cancelHref={activeView === "all" ? "/notes" : `/notes?view=${activeView}`}
+          />
+        ) : (
+          <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="space-y-2">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
+                Note editing
+              </p>
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
+                Refine any saved artifact
+              </h2>
+              <p className="text-sm leading-7 text-slate-600">
+                Manual notes can be authored from scratch, and any saved note can be revised from
+                the list below without losing its source metadata or workspace links.
+              </p>
+            </div>
+          </section>
+        )}
+      </div>
 
       <section className="flex flex-wrap gap-3 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
         {views.map((view) => {
@@ -85,6 +126,21 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
               sourceLabel={getNoteSourceLabel(note)}
               tags={getNoteTags(note.tags)}
               updatedAt={note.updatedAt}
+              actions={
+                <>
+                  <Link
+                    href={
+                      activeView === "all"
+                        ? `/notes?edit=${note.id}`
+                        : `/notes?view=${activeView}&edit=${note.id}`
+                    }
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Edit
+                  </Link>
+                  <DeleteNoteButton noteId={note.id} />
+                </>
+              }
               document={note.document}
             />
           ))}
