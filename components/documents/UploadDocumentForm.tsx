@@ -39,8 +39,8 @@ export function UploadDocumentForm() {
           Add source material to your workspace
         </h2>
         <p className="max-w-3xl text-sm leading-7 text-slate-600">
-          The current development pipeline stores files locally and creates document records with an
-          `UPLOADED` status. Parsing and chunking will take over in the next phase.
+          Files are stored locally for development, validated before ingestion, and processed into
+          extracted text, chunks, and retrieval-ready document records.
         </p>
       </div>
 

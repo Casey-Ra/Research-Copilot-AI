@@ -23,7 +23,7 @@ export default async function DashboardPage() {
       <PageHeader
         eyebrow="Dashboard"
         title="Your research workspace at a glance"
-        description="This dashboard now reads real per-user data from the database, surfaces recent activity, and establishes the reusable card patterns the rest of the product will build on."
+        description="See the health of your workspace, recent activity across documents and notes, and the fastest next steps for moving from upload to grounded research output."
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

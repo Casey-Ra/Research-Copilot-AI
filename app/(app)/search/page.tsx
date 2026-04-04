@@ -73,7 +73,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <PageHeader
         eyebrow="Search"
         title="Semantic retrieval over processed document chunks"
-        description="This search workflow now supports semantic ranking, document and file-type scoping, time-based filtering, and clearer provenance so employers can see a real retrieval experience instead of a stub."
+        description="Search across retrieval-ready chunks with semantic ranking, document and file-type scoping, time-based filtering, and clear provenance back to the source material."
       />
 
       <SearchFilters

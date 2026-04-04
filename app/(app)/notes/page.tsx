@@ -16,6 +16,8 @@ type NotesPageProps = {
   searchParams?: Promise<{
     view?: string;
     edit?: string;
+    error?: string;
+    success?: string;
   }>;
 };
 
@@ -24,10 +26,17 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
   const params = searchParams ? await searchParams : undefined;
   const activeView = params?.view ?? "all";
   const editNoteId = params?.edit?.trim() ?? "";
+  const successMessage = params?.success?.trim() ?? "";
+  const errorMessage = params?.error?.trim() ?? "";
   const [notes, editableNote] = await Promise.all([
     getNotesForUser(user.id),
     editNoteId ? getNoteByIdForUser(editNoteId, user.id) : Promise.resolve(null),
   ]);
+  const resolvedErrorMessage =
+    errorMessage ||
+    (editNoteId && !editableNote
+      ? "That note could not be loaded. It may have been deleted or may not belong to this workspace."
+      : "");
   const filteredNotes =
     activeView === "all" ? notes : notes.filter((note) => getNoteView(note) === activeView);
   const counts = {
@@ -55,8 +64,20 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         description="This notes workspace now stores durable research artifacts from summaries, search, comparison, and grounded chat. It acts as the persistent layer for discoveries made elsewhere in the product."
       />
 
-      <div className="grid gap-6 xl:grid-cols-[0.42fr_0.58fr]">
-        <NoteEditorForm mode="create" />
+      {successMessage ? (
+        <p className="rounded-[1.5rem] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
+          {successMessage}
+        </p>
+      ) : null}
+
+      {resolvedErrorMessage ? (
+        <p className="rounded-[1.5rem] border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+          {resolvedErrorMessage}
+        </p>
+      ) : null}
+
+      <div className="grid gap-6 lg:grid-cols-[0.42fr_0.58fr]">
+        <NoteEditorForm mode="create" activeView={activeView} />
 
         {editableNote ? (
           <NoteEditorForm
@@ -67,6 +88,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
               content: editableNote.content,
               tags: getNoteTags(editableNote.tags),
             }}
+            activeView={activeView}
             cancelHref={activeView === "all" ? "/notes" : `/notes?view=${activeView}`}
           />
         ) : (
@@ -116,7 +138,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           actionHref="/documents"
         />
       ) : (
-        <div className="grid gap-5 xl:grid-cols-2">
+        <div className="grid gap-5 lg:grid-cols-2">
           {filteredNotes.map((note) => (
             <NoteCard
               key={note.id}
@@ -138,7 +160,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
                   >
                     Edit
                   </Link>
-                  <DeleteNoteButton noteId={note.id} />
+                  <DeleteNoteButton noteId={note.id} view={activeView} />
                 </>
               }
               document={note.document}

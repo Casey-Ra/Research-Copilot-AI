@@ -4,6 +4,8 @@ import { getDocumentStorage } from "@/lib/documents/storage";
 import { parseStoredDocument } from "@/lib/documents/parsers";
 import { chunkParsedDocument } from "@/lib/documents/chunking";
 import { generateEmbeddings } from "@/lib/embeddings";
+import { getErrorMessage } from "@/lib/utils/errors";
+import { logger } from "@/lib/utils/logger";
 
 type IngestionResult = {
   documentId: string;
@@ -13,6 +15,11 @@ type IngestionResult = {
 };
 
 export async function ingestDocumentForUser(documentId: string, userId: string): Promise<IngestionResult> {
+  logger.debug("document.ingestion.started", {
+    userId,
+    documentId,
+  });
+
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -104,6 +111,14 @@ export async function ingestDocumentForUser(documentId: string, userId: string):
       }),
     ]);
 
+    logger.info("document.ingestion.completed", {
+      userId,
+      documentId: document.id,
+      chunkCount: chunks.length,
+      pageCount: parsed.pageCount ?? parsed.pages?.length ?? null,
+      embeddingModel: embeddings.model,
+    });
+
     return {
       documentId: document.id,
       chunkCount: chunks.length,
@@ -111,7 +126,7 @@ export async function ingestDocumentForUser(documentId: string, userId: string):
       embeddingModel: embeddings.model,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown ingestion error.";
+    const message = getErrorMessage(error, "Unknown ingestion error.");
 
     await prisma.document.update({
       where: { id: document.id },
@@ -122,6 +137,12 @@ export async function ingestDocumentForUser(documentId: string, userId: string):
           ingestionError: message,
         }),
       },
+    });
+
+    logger.error("document.ingestion.failed", {
+      userId,
+      documentId,
+      message,
     });
 
     throw error;

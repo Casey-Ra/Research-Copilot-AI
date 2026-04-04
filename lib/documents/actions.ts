@@ -10,6 +10,8 @@ import { getDocumentSummaryFromMetadata } from "@/lib/documents/metadata";
 import { generateDocumentSummaryForUser, getSummaryConfig } from "@/lib/documents/summaries";
 import { getDocumentStorage } from "@/lib/documents/storage";
 import { validateUploadInput } from "@/lib/documents/validation";
+import { getErrorMessage } from "@/lib/utils/errors";
+import { logger } from "@/lib/utils/logger";
 import type { DocumentSummaryType } from "@/types/database";
 
 export type UploadDocumentActionState = {
@@ -54,6 +56,12 @@ export async function uploadDocumentAction(
 
   try {
     const ingestionResult = await ingestDocumentForUser(document.id, user.id);
+    logger.info("document.upload.completed", {
+      userId: user.id,
+      documentId: document.id,
+      chunkCount: ingestionResult.chunkCount,
+      fileType: storedObject.fileType,
+    });
 
     revalidatePath("/dashboard");
     revalidatePath("/upload");
@@ -63,7 +71,12 @@ export async function uploadDocumentAction(
       success: `Uploaded ${storedObject.fileName}, extracted text, and stored ${ingestionResult.chunkCount} chunks.`,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown ingestion error.";
+    const message = getErrorMessage(error, "Unknown ingestion error.");
+    logger.error("document.upload.failed", {
+      userId: user.id,
+      documentId: document.id,
+      message,
+    });
 
     revalidatePath("/dashboard");
     revalidatePath("/upload");
@@ -80,7 +93,16 @@ export async function processDocumentAction(documentId: string) {
 
   try {
     await ingestDocumentForUser(documentId, user.id);
-  } catch {
+    logger.info("document.reprocess.completed", {
+      userId: user.id,
+      documentId,
+    });
+  } catch (error) {
+    logger.error("document.reprocess.failed", {
+      userId: user.id,
+      documentId,
+      message: getErrorMessage(error),
+    });
     // The document is marked FAILED inside the ingestion service, so redirecting
     // back to the detail page gives the user the latest status and error context.
   }
@@ -116,6 +138,11 @@ export async function deleteDocumentAction(documentId: string) {
     await storage.deleteFile(existingDocument.storagePath);
   }
 
+  logger.info("document.deleted", {
+    userId: user.id,
+    documentId,
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/upload");
   revalidatePath("/documents");
@@ -132,6 +159,11 @@ export async function generateDocumentSummaryAction(
     await generateDocumentSummaryForUser({
       documentId,
       userId: user.id,
+      summaryType,
+    });
+    logger.info("document.summary.generated", {
+      userId: user.id,
+      documentId,
       summaryType,
     });
   } finally {
@@ -183,9 +215,16 @@ export async function saveDocumentSummaryToNoteAction(
     tags: ["summary", summaryType],
   });
 
+  logger.info("note.summary.saved", {
+    userId: user.id,
+    documentId: document.id,
+    summaryType,
+    sourceId,
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/documents");
   revalidatePath(`/documents/${document.id}`);
   revalidatePath("/notes");
-  redirect("/notes");
+  redirect("/notes?view=summary&success=Summary saved to notes.");
 }

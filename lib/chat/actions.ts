@@ -6,6 +6,8 @@ import { requireUser } from "@/lib/auth/session";
 import { appendChatMessages, createChatSessionForUser } from "@/lib/db/chat";
 import { answerGroundedQuestion } from "@/lib/llm";
 import { buildChatSessionTitle } from "@/lib/chat/session";
+import { getErrorMessage } from "@/lib/utils/errors";
+import { logger } from "@/lib/utils/logger";
 
 function normalizeInput(value: FormDataEntryValue | null) {
   return value?.toString().trim() ?? "";
@@ -48,6 +50,12 @@ export async function sendChatMessageAction(formData: FormData) {
         })
       ).id;
 
+  logger.debug("chat.message.requested", {
+    userId: user.id,
+    chatSessionId: resolvedSessionId,
+    selectedDocumentCount: selectedDocumentIds.length,
+  });
+
   try {
     const groundedAnswer = await answerGroundedQuestion({
       userId: user.id,
@@ -62,11 +70,19 @@ export async function sendChatMessageAction(formData: FormData) {
       assistantMessage: groundedAnswer.answer,
       citations: groundedAnswer.citations,
     });
+    logger.info("chat.message.completed", {
+      userId: user.id,
+      chatSessionId: resolvedSessionId,
+      citationCount: groundedAnswer.citations.length,
+    });
   } catch (error) {
-    const fallbackMessage =
-      error instanceof Error
-        ? `I couldn't complete that grounded answer because: ${error.message}`
-        : "I couldn't complete that grounded answer because of an unexpected error.";
+    const message = getErrorMessage(error);
+    const fallbackMessage = `I couldn't complete that grounded answer because: ${message}`;
+    logger.error("chat.message.failed", {
+      userId: user.id,
+      chatSessionId: resolvedSessionId,
+      message,
+    });
 
     await appendChatMessages({
       chatSessionId: resolvedSessionId,

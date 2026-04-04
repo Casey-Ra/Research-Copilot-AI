@@ -8,7 +8,7 @@ export default function UploadPage() {
       <PageHeader
         eyebrow="Upload"
         title="Upload research documents into the workspace"
-        description="This phase adds the local development storage pipeline. Files and pasted text are validated, saved through a storage abstraction, and recorded in the database with a clean status model."
+        description="Files and pasted text are validated, stored through a replaceable storage abstraction, and moved through a clean ingestion lifecycle from upload to retrieval-ready document data."
       />
 
       <UploadDocumentForm />
@@ -25,10 +25,11 @@ export default function UploadPage() {
           </div>
           <div className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-              Deferred next
+              Processing pipeline
             </p>
             <p className="text-sm leading-7 text-slate-600">
-              Parsing, chunking, and status transitions from `UPLOADED` into later ingestion states.
+              Uploaded sources move through extraction, chunking, embeddings, and status updates so
+              they can be searched, summarized, compared, and used in grounded chat.
             </p>
           </div>
           <div className="space-y-2">

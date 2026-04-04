@@ -1,52 +1,51 @@
 # Research Copilot AI
 
-Research Copilot AI is a production-style portfolio project for document intelligence workflows. The app will let users upload documents, search them semantically, ask grounded questions with citations, generate summaries, compare documents, and save findings as notes.
+Research Copilot AI is a production-style document intelligence app built to demonstrate a full-stack research workflow: upload source material, process it into chunks, search semantically, ask grounded questions with citations, generate summaries, compare documents, and save durable findings as notes.
 
-## Current Scope
-
-The repository now includes a working end-to-end local MVP:
+## Features
 
 - Auth.js-protected workspace routes
-- Local document upload and storage
-- Text extraction and chunking
-- Embeddings with OpenAI-compatible support and local fallback
-- Semantic search with filters
-- Grounded chat with citations
-- Document summaries
-- Document comparison
-- Saved notes from summaries, search findings, comparison outputs, chat answers, and manual entry
+- Local document upload for TXT, PDF, and pasted text
+- Text extraction, normalization, and chunking with overlap
+- Embeddings with OpenAI-compatible support and deterministic local fallback
+- Semantic search with filters and source provenance
+- Grounded chat with stored sessions and clickable citations
+- Document summaries with save-to-notes workflows
+- Document comparison with similarities, differences, and possible contradictions
+- Notes workspace with manual entry plus saved artifacts from summaries, chat, search, and compare
 
-## Tech Stack
+## Architecture
 
-- Next.js
-- TypeScript
-- Tailwind CSS
-- PostgreSQL
-- Prisma ORM
-- Auth.js / NextAuth
-- OpenAI-compatible APIs
-- pgvector
-
-## Folder Structure
+The codebase is organized so UI, data access, ingestion, retrieval, and LLM logic stay separate:
 
 ```text
 app/
-  (auth)/
-  (app)/
-components/
+  (auth)/          # sign-in and public auth entry points
+  (app)/           # protected workspace routes
+  api/             # Auth.js route handlers
+components/        # reusable UI components
 lib/
-  auth/
-  db/
-  documents/
-  embeddings/
-  retrieval/
-  llm/
-  utils/
-prisma/
-types/
+  auth/            # session helpers and auth config
+  chat/            # chat session/action orchestration
+  db/              # Prisma client and query helpers
+  documents/       # storage, parsing, chunking, summaries, compare
+  embeddings/      # embedding provider abstraction
+  llm/             # grounded response and summary generation
+  notes/           # note actions and presentation helpers
+  retrieval/       # semantic retrieval and vector utilities
+  utils/           # shared utility helpers
+prisma/            # schema, migrations, seed
+types/             # shared TypeScript types
 ```
 
-## Local Setup
+Key design choices:
+
+- Business logic stays out of page components and lives in `lib/*` services.
+- Every user-facing data query is user-scoped to enforce ownership.
+- Storage is abstracted behind a local implementation so cloud storage can replace it later.
+- Retrieval is isolated from Prisma and UI code, which keeps future `pgvector` adoption manageable.
+
+## Setup
 
 1. Install dependencies.
 
@@ -60,7 +59,7 @@ npm install
 cp .env.example .env
 ```
 
-3. Update `.env` with your local PostgreSQL connection string and API keys.
+3. Update `.env` with your local PostgreSQL connection string, Auth.js secret, and any optional API keys.
 
 4. Generate the Prisma client.
 
@@ -68,7 +67,7 @@ cp .env.example .env
 npx prisma generate
 ```
 
-5. Apply the database migration.
+5. Run the local migrations.
 
 ```bash
 npx prisma migrate dev
@@ -86,59 +85,65 @@ npm run prisma:seed
 npm run dev
 ```
 
-## Prisma Setup
+8. Open `http://localhost:3000`.
 
-The Prisma schema now includes the core Auth.js models and the MVP product models:
+## Environment Variables
 
-- `User`
-- `Account`
-- `Session`
-- `VerificationToken`
-- `Document`
-- `DocumentChunk`
-- `ChatSession`
-- `ChatMessage`
-- `Note`
+Important values from `.env.example`:
 
-## Seed Strategy
+- `DATABASE_URL`: PostgreSQL connection string used by Prisma
+- `AUTH_SECRET`: secret used by Auth.js / NextAuth
+- `AUTH_GITHUB_ID` and `AUTH_GITHUB_SECRET`: optional GitHub OAuth credentials
+- `OPENAI_API_KEY`: optional key for OpenAI-compatible embeddings and chat
+- `OPENAI_BASE_URL`: override for a compatible provider endpoint
+- `EMBEDDING_MODEL`: embedding model name
+- `CHAT_MODEL`: chat/completion model name
+- `EMBEDDING_DIMENSIONS`: embedding vector size used by the fallback storage format
+- `CHUNK_SIZE_CHARS`: chunk size used during ingestion
+- `CHUNK_OVERLAP_CHARS`: overlap size used between chunks
+- `UPLOAD_DIR`: local development storage directory
+- `APP_LOG_LEVEL`: logging verbosity for server-side hooks
 
-A lightweight development seed lives in [prisma/seed.ts](/c:/Users/craws/Documents/Code/Research-Copilot-AI/prisma/seed.ts). It creates:
+The app still works without an external model key by using deterministic fallback behavior for embeddings, summaries, and grounded answers, which makes local setup easier.
+
+## Data Model
+
+The Prisma schema includes:
+
+- Auth.js models: `User`, `Account`, `Session`, `VerificationToken`
+- Product models: `Document`, `DocumentChunk`, `ChatSession`, `ChatMessage`, `Note`
+
+Notable schema decisions:
+
+- `Document.status` is an enum to support a clear ingestion lifecycle
+- `DocumentChunk.embedding` is stored as `Json` for portability while retrieval remains abstraction-friendly
+- `Note` supports both generic provenance (`sourceType`, `sourceId`) and optional direct links to documents or chat messages
+
+## Development Notes
+
+The seed script in [prisma/seed.ts](/c:/Users/craws/Documents/Code/Research-Copilot-AI/prisma/seed.ts) creates a local demo workspace with:
 
 - a demo user
-- two ready documents with overlapping and distinct evidence
-- seeded document chunks with embeddings
-- one chat session with sample messages
-- one note linked back to the assistant message
+- multiple READY documents with overlapping and distinct evidence
+- retrieval-ready chunks and embeddings
+- a sample chat session
+- starter notes tied back to generated artifacts
 
-Run it with:
+Storage is handled through [lib/documents/storage.ts](/c:/Users/craws/Documents/Code/Research-Copilot-AI/lib/documents/storage.ts), which keeps disk writes out of page components and stores only relative paths in the database.
 
-```bash
-npm run prisma:seed
-```
+## Tradeoffs
 
-## Schema Notes
+- `pgvector` is listed in the stack, but the current MVP keeps embeddings in JSON so local setup stays practical and the retrieval layer can evolve without locking early into a database-specific implementation.
+- Document ingestion runs inline from server actions for simplicity. A production deployment would likely move parsing and embedding work into background jobs.
+- PDF support prioritizes reliable text extraction and page-aware chunk metadata over pixel-perfect document reconstruction.
+- The app favors maintainable server-side flows and clear ownership checks over aggressive client-side interactivity.
 
-- Every product model is user-owned directly or indirectly to support strict data isolation.
-- `Document.status` is an enum so the upload and ingestion pipeline can evolve without string drift.
-- `DocumentChunk.embedding` is currently stored as `Json` to keep setup practical while the retrieval layer remains database-agnostic.
-- `Note` supports both generic source tracking (`sourceType`, `sourceId`) and optional direct relations to documents or chat messages.
+## Future Improvements
 
-## Architecture Choices
-
-- `app/` owns route-level UI and presentation concerns.
-- `components/` holds reusable visual building blocks such as the navbar and page scaffolding.
-- `lib/db` owns database setup so Prisma usage stays out of page components.
-- `lib/auth`, `lib/documents`, `lib/embeddings`, `lib/retrieval`, `lib/llm`, and `lib/notes` keep feature logic separated by concern.
-- `types/` is reserved for shared TypeScript types that should not live inside UI or service modules.
-
-This structure keeps business logic out of the UI, makes future testing easier, and leaves a clear upgrade path for cloud storage, background jobs, and team workspaces.
-
-## Upload Storage
-
-Phase 4 stores uploaded files through a storage abstraction in [lib/documents/storage.ts](/c:/Users/craws/Documents/Code/Research-Copilot-AI/lib/documents/storage.ts).
-
-- The current implementation writes files to the local filesystem under `UPLOAD_DIR`.
-- Document records only persist the relative `storagePath`, not storage-specific implementation details.
-- Server actions call the storage interface instead of writing files directly from page components.
-
-That separation keeps the upload flow easy to migrate later to S3, Blob storage, or team-scoped buckets.
+- Add DOCX parsing support
+- Add hybrid keyword + semantic retrieval
+- Add highlighted citation spans inside the document viewer
+- Move ingestion and summary generation to background workers
+- Add team workspaces and shared collections
+- Swap local storage for S3, Blob, or another cloud storage provider
+- Add analytics and an admin/debug view for ingestion and retrieval diagnostics

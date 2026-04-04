@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db/prisma";
 import { upsertNoteForUserBySource } from "@/lib/db/notes";
 import { requireUser } from "@/lib/auth/session";
 import { compareDocumentsForUser } from "@/lib/documents/comparison";
+import { logger } from "@/lib/utils/logger";
 
 function normalizeQueryForSourceId(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, "-").slice(0, 80);
@@ -38,14 +39,53 @@ function normalizeEntry(value: FormDataEntryValue | null) {
   return value?.toString().trim() ?? "";
 }
 
+function normalizeView(value: FormDataEntryValue | null) {
+  const view = normalizeEntry(value);
+  return view === "all" ? "" : view;
+}
+
+function buildNotesHref(input?: {
+  view?: string;
+  edit?: string;
+  error?: string;
+  success?: string;
+}) {
+  const search = new URLSearchParams();
+
+  if (input?.view) {
+    search.set("view", input.view);
+  }
+
+  if (input?.edit) {
+    search.set("edit", input.edit);
+  }
+
+  if (input?.error) {
+    search.set("error", input.error);
+  }
+
+  if (input?.success) {
+    search.set("success", input.success);
+  }
+
+  const query = search.toString();
+  return query ? `/notes?${query}` : "/notes";
+}
+
 export async function createManualNoteAction(formData: FormData) {
   const user = await requireUser();
+  const view = normalizeView(formData.get("view"));
   const title = normalizeEntry(formData.get("title"));
   const content = normalizeEntry(formData.get("content"));
   const tags = normalizeNoteTags(normalizeEntry(formData.get("tags")));
 
   if (!title || !content) {
-    redirect("/notes");
+    redirect(
+      buildNotesHref({
+        view,
+        error: "Title and content are required to save a note.",
+      }),
+    );
   }
 
   await prisma.note.create({
@@ -58,19 +98,31 @@ export async function createManualNoteAction(formData: FormData) {
     },
   });
 
+  logger.info("note.manual.created", {
+    userId: user.id,
+    tagCount: tags.length,
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/notes");
-  redirect("/notes");
+  redirect(buildNotesHref({ view: "manual", success: "Manual note saved." }));
 }
 
 export async function updateNoteAction(noteId: string, formData: FormData) {
   const user = await requireUser();
+  const view = normalizeView(formData.get("view"));
   const title = normalizeEntry(formData.get("title"));
   const content = normalizeEntry(formData.get("content"));
   const tags = normalizeNoteTags(normalizeEntry(formData.get("tags")));
 
   if (!title || !content) {
-    redirect(`/notes?edit=${noteId}`);
+    redirect(
+      buildNotesHref({
+        view,
+        edit: noteId,
+        error: "Title and content are required to update a note.",
+      }),
+    );
   }
 
   await prisma.note.updateMany({
@@ -86,13 +138,20 @@ export async function updateNoteAction(noteId: string, formData: FormData) {
     },
   });
 
+  logger.info("note.updated", {
+    userId: user.id,
+    noteId,
+    tagCount: tags.length,
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/notes");
-  redirect("/notes");
+  redirect(buildNotesHref({ view, success: "Note updated." }));
 }
 
-export async function deleteNoteAction(noteId: string) {
+export async function deleteNoteAction(noteId: string, formData: FormData) {
   const user = await requireUser();
+  const view = normalizeView(formData.get("view"));
 
   await prisma.note.deleteMany({
     where: {
@@ -101,9 +160,14 @@ export async function deleteNoteAction(noteId: string) {
     },
   });
 
+  logger.info("note.deleted", {
+    userId: user.id,
+    noteId,
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/notes");
-  redirect("/notes");
+  redirect(buildNotesHref({ view, success: "Note deleted." }));
 }
 
 export async function saveSearchResultNoteAction(input: {
@@ -167,10 +231,17 @@ export async function saveSearchResultNoteAction(input: {
     tags: ["search", "document-evidence", normalizedQuery || "search-result"],
   });
 
+  logger.info("note.search.saved", {
+    userId: user.id,
+    chunkId: chunk.id,
+    documentId: chunk.document.id,
+    query: normalizedQuery || "queryless",
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/search");
   revalidatePath("/notes");
-  redirect("/notes");
+  redirect(buildNotesHref({ view: "search", success: "Search finding saved to notes." }));
 }
 
 export async function saveComparisonNoteAction(input: {
@@ -235,10 +306,17 @@ export async function saveComparisonNoteAction(input: {
     tags: ["compare", normalizedFocus || "overall-comparison"],
   });
 
+  logger.info("note.compare.saved", {
+    userId: user.id,
+    leftDocumentId: comparison.leftDocument.id,
+    rightDocumentId: comparison.rightDocument.id,
+    focus: normalizedFocus || "overall",
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/compare");
   revalidatePath("/notes");
-  redirect("/notes");
+  redirect(buildNotesHref({ view: "compare", success: "Comparison note saved." }));
 }
 
 export async function saveChatMessageNoteAction(chatMessageId: string) {
@@ -277,8 +355,13 @@ export async function saveChatMessageNoteAction(chatMessageId: string) {
     tags: ["chat", "grounded-answer"],
   });
 
+  logger.info("note.chat.saved", {
+    userId: user.id,
+    chatMessageId: message.id,
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/chat");
   revalidatePath("/notes");
-  redirect("/notes?view=chat");
+  redirect(buildNotesHref({ view: "chat", success: "Chat answer saved to notes." }));
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createManualNoteAction, updateNoteAction } from "@/lib/notes/actions";
 
 type NoteEditorFormProps = {
@@ -8,10 +9,11 @@ type NoteEditorFormProps = {
     content: string;
     tags: string[];
   };
+  activeView?: string;
   cancelHref?: string;
 };
 
-export function NoteEditorForm({ mode, note, cancelHref }: NoteEditorFormProps) {
+export function NoteEditorForm({ mode, note, activeView, cancelHref }: NoteEditorFormProps) {
   const action =
     mode === "create"
       ? createManualNoteAction
@@ -19,6 +21,8 @@ export function NoteEditorForm({ mode, note, cancelHref }: NoteEditorFormProps) 
 
   return (
     <form action={action} className="space-y-4 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+      {activeView ? <input type="hidden" name="view" value={activeView} /> : null}
+
       <div className="space-y-2">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
           {mode === "create" ? "Manual note" : "Edit note"}
@@ -76,12 +80,12 @@ export function NoteEditorForm({ mode, note, cancelHref }: NoteEditorFormProps) 
           {mode === "create" ? "Save manual note" : "Update note"}
         </button>
         {cancelHref ? (
-          <a
+          <Link
             href={cancelHref}
             className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
           >
             Cancel
-          </a>
+          </Link>
         ) : null}
       </div>
     </form>
