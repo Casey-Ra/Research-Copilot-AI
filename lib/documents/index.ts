@@ -19,6 +19,22 @@ export type DocumentChunkRecord = {
   embedding?: unknown;
 };
 
-// Phase 2 note:
-// The database schema now supports documents and chunks, but parsing and chunk creation
-// are still deferred to the ingestion phase.
+export type ParsedPage = {
+  pageNumber: number;
+  text: string;
+};
+
+export type ParsedDocument = {
+  text: string;
+  pageCount?: number;
+  pages?: ParsedPage[];
+  metadata?: Record<string, unknown>;
+};
+
+export type ChunkedDocumentRecord = {
+  chunkIndex: number;
+  text: string;
+  pageNumber?: number | null;
+  startOffset?: number | null;
+  endOffset?: number | null;
+};

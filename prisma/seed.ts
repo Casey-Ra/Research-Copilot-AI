@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, ChatRole, DocumentStatus, NoteSourceType } from "@prisma/client";
+import { generateEmbeddings } from "@/lib/embeddings";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -43,30 +44,47 @@ async function main() {
         "Research Copilot AI can help analysts review long-form documents, extract key claims, and preserve citations for follow-up work.",
       metadata: {
         source: "seed",
+        embeddingProvider: "local-fallback",
       },
     },
   });
 
+  const seedChunks = [
+    {
+      chunkIndex: 0,
+      text: "Research Copilot AI can help analysts review long-form documents.",
+      startOffset: 0,
+      endOffset: 67,
+    },
+    {
+      chunkIndex: 1,
+      text: "It is designed to support grounded answers with citations and reusable notes.",
+      startOffset: 68,
+      endOffset: 146,
+    },
+  ];
+
+  const embeddings = await generateEmbeddings({
+    texts: seedChunks.map((chunk) => chunk.text),
+    userId: demoUser.id,
+  });
+
+  await prisma.documentChunk.deleteMany({
+    where: {
+      documentId: document.id,
+    },
+  });
+
   await prisma.documentChunk.createMany({
-    data: [
-      {
-        documentId: document.id,
-        chunkIndex: 0,
-        text: "Research Copilot AI can help analysts review long-form documents.",
-        startOffset: 0,
-        endOffset: 67,
-        embeddingModel: "stub-seed",
-      },
-      {
-        documentId: document.id,
-        chunkIndex: 1,
-        text: "It is designed to support grounded answers with citations and reusable notes.",
-        startOffset: 68,
-        endOffset: 146,
-        embeddingModel: "stub-seed",
-      },
-    ],
-    skipDuplicates: true,
+    data: seedChunks.map((chunk, index) => ({
+      documentId: document.id,
+      chunkIndex: chunk.chunkIndex,
+      text: chunk.text,
+      startOffset: chunk.startOffset,
+      endOffset: chunk.endOffset,
+      embedding: embeddings.vectors[index],
+      embeddingModel: embeddings.model,
+    })),
   });
 
   const chatSession = await prisma.chatSession.upsert({

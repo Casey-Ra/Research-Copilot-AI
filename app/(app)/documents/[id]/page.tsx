@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { DeleteDocumentButton } from "@/components/documents/DeleteDocumentButton";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
+import { ProcessDocumentButton } from "@/components/documents/ProcessDocumentButton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { requireUser } from "@/lib/auth/session";
 import { getDocumentByIdForUser } from "@/lib/db/documents";
@@ -110,6 +111,14 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
                     Local storage path: <span className="font-medium text-slate-950">{document.storagePath}</span>
                   </p>
                 ) : null}
+                {document.metadata &&
+                typeof document.metadata === "object" &&
+                "ingestionError" in document.metadata &&
+                typeof document.metadata.ingestionError === "string" ? (
+                  <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                    Last ingestion error: {document.metadata.ingestionError}
+                  </p>
+                ) : null}
               </div>
             )}
           </div>
@@ -131,9 +140,19 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
                 {document.chunks.map((chunk) => (
                   <article key={chunk.id} className="rounded-[1.25rem] bg-slate-50 p-4">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-slate-950">
-                        Chunk {chunk.chunkIndex + 1}
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-slate-950">
+                          Chunk {chunk.chunkIndex + 1}
+                        </p>
+                        <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.16em] text-slate-400">
+                          {chunk.pageNumber ? <span>Page {chunk.pageNumber}</span> : null}
+                          {chunk.startOffset !== null && chunk.endOffset !== null ? (
+                            <span>
+                              Offsets {chunk.startOffset}-{chunk.endOffset}
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
                       <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
                         {formatShortDateTime(chunk.createdAt)}
                       </p>
@@ -148,10 +167,14 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
           <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-950">Document actions</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Phase 3 adds safe delete support. Summaries, search-within-document, and ask-about-this
-              actions will arrive in later phases.
+              The ingestion pipeline can be rerun at any time. Summaries, search-within-document,
+              and ask-about-this actions will arrive in later phases.
             </p>
-            <div className="mt-5">
+            <div className="mt-5 flex flex-wrap gap-3">
+              <ProcessDocumentButton
+                documentId={document.id}
+                label={document.status === "FAILED" ? "Retry processing" : "Reprocess document"}
+              />
               <DeleteDocumentButton documentId={document.id} />
             </div>
           </section>

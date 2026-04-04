@@ -1,6 +1,4 @@
-import "server-only";
-
-import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
@@ -19,6 +17,7 @@ export interface DocumentStorage {
     fileType: string;
     bytes: Buffer;
   }): Promise<StoredObject>;
+  readFile(storagePath: string): Promise<Buffer>;
   deleteFile(storagePath: string): Promise<void>;
 }
 
@@ -73,6 +72,16 @@ class LocalDocumentStorage implements DocumentStorage {
         throw error;
       }
     }
+  }
+
+  async readFile(storagePath: string): Promise<Buffer> {
+    const absolutePath = path.resolve(process.cwd(), storagePath);
+
+    if (!absolutePath.startsWith(this.rootDir)) {
+      throw new Error("Refusing to read a file outside the configured upload directory.");
+    }
+
+    return readFile(absolutePath);
   }
 }
 

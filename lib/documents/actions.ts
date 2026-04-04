@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { requireUser } from "@/lib/auth/session";
+import { ingestDocumentForUser } from "@/lib/documents/ingestion";
 import { getDocumentStorage } from "@/lib/documents/storage";
 import { validateUploadInput } from "@/lib/documents/validation";
 
@@ -31,7 +32,7 @@ export async function uploadDocumentAction(
     bytes: validationResult.bytes,
   });
 
-  await prisma.document.create({
+  const document = await prisma.document.create({
     data: {
       userId: user.id,
       title: validationResult.title,
@@ -47,13 +48,43 @@ export async function uploadDocumentAction(
     },
   });
 
+  try {
+    const ingestionResult = await ingestDocumentForUser(document.id, user.id);
+
+    revalidatePath("/dashboard");
+    revalidatePath("/upload");
+    revalidatePath("/documents");
+
+    return {
+      success: `Uploaded ${storedObject.fileName}, extracted text, and stored ${ingestionResult.chunkCount} chunks.`,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown ingestion error.";
+
+    revalidatePath("/dashboard");
+    revalidatePath("/upload");
+    revalidatePath("/documents");
+
+    return {
+      error: `The file was uploaded, but processing failed. The document is marked FAILED. ${message}`,
+    };
+  }
+}
+
+export async function processDocumentAction(documentId: string) {
+  const user = await requireUser();
+
+  try {
+    await ingestDocumentForUser(documentId, user.id);
+  } catch {
+    // The document is marked FAILED inside the ingestion service, so redirecting
+    // back to the detail page gives the user the latest status and error context.
+  }
+
   revalidatePath("/dashboard");
   revalidatePath("/upload");
   revalidatePath("/documents");
-
-  return {
-    success: `Uploaded ${storedObject.fileName} and created a document record with UPLOADED status.`,
-  };
+  redirect(`/documents/${documentId}`);
 }
 
 export async function deleteDocumentAction(documentId: string) {

@@ -23,10 +23,12 @@
     "@next-auth/prisma-adapter": "latest",
     "@prisma/adapter-pg": "latest",
     "@prisma/client": "latest",
+    "pdf-parse": "latest",
     "prisma": "latest",
     "pg": "latest",
     "pgvector": "latest",
     "openai": "latest",
+    "server-only": "latest",
     "clsx": "latest",
     "tailwind-merge": "latest"
   },
