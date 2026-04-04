@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { SaveSearchNoteButton } from "@/components/search/SaveSearchNoteButton";
 import { formatShortDate } from "@/lib/utils/format";
 
 type SearchResultCardProps = {
   rank: number;
   query: string;
   result: {
+    chunkId: string;
     score: number;
     documentId: string;
     documentTitle: string;
@@ -86,12 +88,29 @@ export function SearchResultCard({ rank, query, result }: SearchResultCardProps)
             </span>
           ) : null}
         </div>
-        <Link
-          href={`/documents/${result.documentId}`}
-          className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-        >
-          Open source
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <SaveSearchNoteButton
+            input={{
+              chunkId: result.chunkId,
+              documentId: result.documentId,
+              documentTitle: result.documentTitle,
+              fileName: result.fileName,
+              fileType: result.fileType,
+              query,
+              score: result.score,
+              text: result.text,
+              pageNumber: result.pageNumber,
+              startOffset: result.startOffset,
+              endOffset: result.endOffset,
+            }}
+          />
+          <Link
+            href={`/documents/${result.documentId}`}
+            className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            Open source
+          </Link>
+        </div>
       </div>
     </article>
   );

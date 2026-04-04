@@ -6,6 +6,8 @@ type NoteCardProps = {
   title: string;
   content: string;
   sourceType: NoteSourceType;
+  sourceLabel?: string;
+  tags?: string[];
   updatedAt: Date;
   document?: {
     id: string;
@@ -22,6 +24,8 @@ export function NoteCard({
   title,
   content,
   sourceType,
+  sourceLabel,
+  tags,
   updatedAt,
   document,
 }: NoteCardProps) {
@@ -30,7 +34,7 @@ export function NoteCard({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
-            {formatSourceType(sourceType)}
+            {sourceLabel ?? formatSourceType(sourceType)}
           </p>
           <h2 className="text-xl font-semibold tracking-tight text-slate-950">{title}</h2>
         </div>
@@ -38,6 +42,19 @@ export function NoteCard({
           Updated {formatShortDateTime(updatedAt)}
         </p>
       </div>
+
+      {tags && tags.length > 0 ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       <div className="mt-4 rounded-[1.25rem] bg-slate-50 p-4">
         <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">{content}</p>

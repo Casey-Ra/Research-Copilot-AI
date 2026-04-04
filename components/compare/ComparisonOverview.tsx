@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SaveComparisonNoteButton } from "@/components/compare/SaveComparisonNoteButton";
 import { formatShortDate } from "@/lib/utils/format";
 
 type ComparisonOverviewProps = {
@@ -66,6 +67,14 @@ export function ComparisonOverview({
         <div className={`rounded-full px-4 py-2 text-sm font-semibold capitalize ${getSimilarityTone(similarityLabel)}`}>
           {similarityLabel} overlap · {similarityScore.toFixed(3)}
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <SaveComparisonNoteButton
+          leftDocumentId={leftDocument.id}
+          rightDocumentId={rightDocument.id}
+          focusQuery={focusQuery}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
