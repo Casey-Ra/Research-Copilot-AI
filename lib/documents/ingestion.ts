@@ -1,5 +1,5 @@
-import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
+import { mergeDocumentMetadata } from "@/lib/documents/metadata";
 import { getDocumentStorage } from "@/lib/documents/storage";
 import { parseStoredDocument } from "@/lib/documents/parsers";
 import { chunkParsedDocument } from "@/lib/documents/chunking";
@@ -11,21 +11,6 @@ type IngestionResult = {
   pageCount?: number;
   embeddingModel?: string;
 };
-
-function mergeMetadata(
-  existing: unknown,
-  incoming: Record<string, unknown>,
-): Prisma.InputJsonValue {
-  const base =
-    existing && typeof existing === "object" && !Array.isArray(existing)
-      ? (existing as Prisma.JsonObject)
-      : {};
-
-  return {
-    ...base,
-    ...incoming,
-  } as Prisma.InputJsonValue;
-}
 
 export async function ingestDocumentForUser(documentId: string, userId: string): Promise<IngestionResult> {
   const document = await prisma.document.findFirst({
@@ -44,7 +29,7 @@ export async function ingestDocumentForUser(documentId: string, userId: string):
       where: { id: document.id },
       data: {
         status: "FAILED",
-        metadata: mergeMetadata(document.metadata, {
+        metadata: mergeDocumentMetadata(document.metadata, {
           ingestionError: "Document is missing a storage path.",
         }),
       },
@@ -57,7 +42,7 @@ export async function ingestDocumentForUser(documentId: string, userId: string):
     where: { id: document.id },
     data: {
       status: "PROCESSING",
-      metadata: mergeMetadata(document.metadata, {
+      metadata: mergeDocumentMetadata(document.metadata, {
         ingestionStartedAt: new Date().toISOString(),
         ingestionError: null,
       }),
@@ -93,7 +78,7 @@ export async function ingestDocumentForUser(documentId: string, userId: string):
         data: {
           extractedText: parsed.text,
           status: "READY",
-          metadata: mergeMetadata(document.metadata, {
+          metadata: mergeDocumentMetadata(document.metadata, {
             ...parsed.metadata,
             pageCount: parsed.pageCount ?? parsed.pages?.length ?? null,
             chunkCount: chunks.length,
@@ -132,7 +117,7 @@ export async function ingestDocumentForUser(documentId: string, userId: string):
       where: { id: document.id },
       data: {
         status: "FAILED",
-        metadata: mergeMetadata(document.metadata, {
+        metadata: mergeDocumentMetadata(document.metadata, {
           ingestionFailedAt: new Date().toISOString(),
           ingestionError: message,
         }),

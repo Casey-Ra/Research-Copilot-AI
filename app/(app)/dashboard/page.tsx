@@ -76,7 +76,7 @@ export default async function DashboardPage() {
             title="Recent notes"
             description="Saved findings and note records connected to this user's workspace."
             emptyTitle="No notes yet"
-            emptyDescription="Notes will appear here once summaries and save-from-chat flows are built."
+            emptyDescription="Notes will appear here once you save a summary or capture a grounded chat answer."
             items={activity.notes.map((note) => ({
               id: note.id,
               title: note.title,

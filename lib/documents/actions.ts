@@ -5,8 +5,11 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { requireUser } from "@/lib/auth/session";
 import { ingestDocumentForUser } from "@/lib/documents/ingestion";
+import { getDocumentSummaryFromMetadata } from "@/lib/documents/metadata";
+import { generateDocumentSummaryForUser, getSummaryConfig } from "@/lib/documents/summaries";
 import { getDocumentStorage } from "@/lib/documents/storage";
 import { validateUploadInput } from "@/lib/documents/validation";
+import type { DocumentSummaryType } from "@/types/database";
 
 export type UploadDocumentActionState = {
   error?: string;
@@ -116,4 +119,99 @@ export async function deleteDocumentAction(documentId: string) {
   revalidatePath("/upload");
   revalidatePath("/documents");
   redirect("/documents");
+}
+
+export async function generateDocumentSummaryAction(
+  documentId: string,
+  summaryType: DocumentSummaryType,
+) {
+  const user = await requireUser();
+
+  try {
+    await generateDocumentSummaryForUser({
+      documentId,
+      userId: user.id,
+      summaryType,
+    });
+  } finally {
+    revalidatePath("/dashboard");
+    revalidatePath("/documents");
+    revalidatePath(`/documents/${documentId}`);
+    revalidatePath("/notes");
+  }
+
+  redirect(`/documents/${documentId}`);
+}
+
+export async function saveDocumentSummaryToNoteAction(
+  documentId: string,
+  summaryType: DocumentSummaryType,
+) {
+  const user = await requireUser();
+  const document = await prisma.document.findFirst({
+    where: {
+      id: documentId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+      title: true,
+      metadata: true,
+    },
+  });
+
+  if (!document) {
+    redirect("/documents");
+  }
+
+  const summary = getDocumentSummaryFromMetadata(document.metadata, summaryType);
+
+  if (!summary) {
+    redirect(`/documents/${document.id}`);
+  }
+
+  const summaryConfig = getSummaryConfig(summaryType);
+  const sourceId = `document-summary:${document.id}:${summaryType}`;
+  const existingNote = await prisma.note.findFirst({
+    where: {
+      userId: user.id,
+      sourceType: "SUMMARY",
+      sourceId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingNote) {
+    await prisma.note.update({
+      where: {
+        id: existingNote.id,
+      },
+      data: {
+        title: `${document.title} - ${summaryConfig.noteTitle}`,
+        content: summary.content,
+        documentId: document.id,
+        tags: ["summary", summaryType],
+      },
+    });
+  } else {
+    await prisma.note.create({
+      data: {
+        userId: user.id,
+        documentId: document.id,
+        title: `${document.title} - ${summaryConfig.noteTitle}`,
+        content: summary.content,
+        sourceType: "SUMMARY",
+        sourceId,
+        tags: ["summary", summaryType],
+      },
+    });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/documents");
+  revalidatePath(`/documents/${document.id}`);
+  revalidatePath("/notes");
+  redirect("/notes");
 }

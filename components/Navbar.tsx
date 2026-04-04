@@ -6,6 +6,7 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/upload", label: "Upload" },
   { href: "/documents", label: "Documents" },
+  { href: "/compare", label: "Compare" },
   { href: "/search", label: "Search" },
   { href: "/chat", label: "Chat" },
   { href: "/notes", label: "Notes" },

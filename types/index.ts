@@ -3,6 +3,7 @@ export type AppRouteKey =
   | "upload"
   | "documents"
   | "document-detail"
+  | "compare"
   | "search"
   | "chat"
   | "notes";

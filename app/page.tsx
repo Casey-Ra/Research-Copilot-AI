@@ -17,6 +17,11 @@ const sections = [
     description: "Manage source files and drill into each document's processing lifecycle.",
   },
   {
+    href: "/compare",
+    title: "Compare",
+    description: "Compare two processed documents side by side with grounded overlap and unique evidence.",
+  },
+  {
     href: "/search",
     title: "Semantic Search",
     description: "Search across document chunks with future-ready retrieval abstractions.",

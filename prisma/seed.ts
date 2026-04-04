@@ -49,6 +49,31 @@ async function main() {
     },
   });
 
+  const comparisonDocument = await prisma.document.upsert({
+    where: { id: "demo-document-2" },
+    update: {
+      title: "Launch Risk Review",
+      status: DocumentStatus.READY,
+      userId: demoUser.id,
+    },
+    create: {
+      id: "demo-document-2",
+      userId: demoUser.id,
+      title: "Launch Risk Review",
+      fileName: "launch-risk-review.txt",
+      fileType: "text/plain",
+      storagePath: "storage/uploads/launch-risk-review.txt",
+      fileSizeBytes: 2336,
+      status: DocumentStatus.READY,
+      extractedText:
+        "The launch review recommends grounded answers with citations for critical decisions, but it focuses more heavily on rollout risks, escalation paths, and follow-up actions after release.",
+      metadata: {
+        source: "seed",
+        embeddingProvider: "local-fallback",
+      },
+    },
+  });
+
   const seedChunks = [
     {
       chunkIndex: 0,
@@ -64,8 +89,23 @@ async function main() {
     },
   ];
 
+  const comparisonChunks = [
+    {
+      chunkIndex: 0,
+      text: "The launch review recommends grounded answers with citations for critical decisions.",
+      startOffset: 0,
+      endOffset: 83,
+    },
+    {
+      chunkIndex: 1,
+      text: "It focuses more heavily on rollout risks, escalation paths, and follow-up actions after release.",
+      startOffset: 84,
+      endOffset: 183,
+    },
+  ];
+
   const embeddings = await generateEmbeddings({
-    texts: seedChunks.map((chunk) => chunk.text),
+    texts: [...seedChunks.map((chunk) => chunk.text), ...comparisonChunks.map((chunk) => chunk.text)],
     userId: demoUser.id,
   });
 
@@ -83,6 +123,24 @@ async function main() {
       startOffset: chunk.startOffset,
       endOffset: chunk.endOffset,
       embedding: embeddings.vectors[index],
+      embeddingModel: embeddings.model,
+    })),
+  });
+
+  await prisma.documentChunk.deleteMany({
+    where: {
+      documentId: comparisonDocument.id,
+    },
+  });
+
+  await prisma.documentChunk.createMany({
+    data: comparisonChunks.map((chunk, index) => ({
+      documentId: comparisonDocument.id,
+      chunkIndex: chunk.chunkIndex,
+      text: chunk.text,
+      startOffset: chunk.startOffset,
+      endOffset: chunk.endOffset,
+      embedding: embeddings.vectors[seedChunks.length + index],
       embeddingModel: embeddings.model,
     })),
   });

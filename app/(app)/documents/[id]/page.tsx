@@ -1,12 +1,19 @@
 import { notFound } from "next/navigation";
 import { DeleteDocumentButton } from "@/components/documents/DeleteDocumentButton";
+import { SummaryCard } from "@/components/documents/SummaryCard";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
 import { ProcessDocumentButton } from "@/components/documents/ProcessDocumentButton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { requireUser } from "@/lib/auth/session";
+import {
+  getDocumentSummaryError,
+  getDocumentSummaryFromMetadata,
+} from "@/lib/documents/metadata";
+import { getAllSummaryTypes, getSummaryConfig } from "@/lib/documents/summaries";
 import { getDocumentByIdForUser } from "@/lib/db/documents";
 import { formatShortDate, formatShortDateTime } from "@/lib/utils/format";
+import type { DocumentSummaryType } from "@/types/database";
 
 type DocumentDetailPageProps = {
   params: {
@@ -27,6 +34,13 @@ function getStatusTone(status: "UPLOADED" | "PROCESSING" | "READY" | "FAILED") {
   }
 }
 
+const summaryDescriptions: Record<DocumentSummaryType, string> = {
+  concise: "A short grounded overview for quick orientation before diving into the full text.",
+  bullets: "A scannable bullet version for recruiters, collaborators, or later review.",
+  takeaways: "The most important conclusions or insights supported by the processed document text.",
+  actionItems: "Explicit next steps only when the document actually supports them.",
+};
+
 export default async function DocumentDetailPage({ params }: DocumentDetailPageProps) {
   const user = await requireUser();
   const document = await getDocumentByIdForUser(params.id, user.id);
@@ -35,12 +49,20 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
     notFound();
   }
 
+  const canGenerateSummaries = Boolean(document.extractedText?.trim()) || document.chunks.length > 0;
+  const summaryCards = getAllSummaryTypes().map((summaryType) => ({
+    summaryType,
+    config: getSummaryConfig(summaryType),
+    summary: getDocumentSummaryFromMetadata(document.metadata, summaryType),
+    error: getDocumentSummaryError(document.metadata, summaryType),
+  }));
+
   return (
     <div className="space-y-8">
       <PageHeader
         eyebrow="Document Detail"
         title={document.title}
-        description="This detail page is now backed by a real user-owned document record. It surfaces current metadata, chunk counts, note links, and a safe delete action while richer ingestion features are still in progress."
+        description="This detail page is now grounded in real processed content. You can inspect chunk data, generate citation-safe summaries from the extracted text, and save summary outputs into your notes workspace."
       />
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -103,8 +125,8 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
             ) : (
               <div className="mt-3 space-y-3 text-sm leading-7 text-slate-600">
                 <p>
-                  No extracted text has been saved yet. This is expected until the parsing phase is
-                  implemented.
+                  No extracted text has been saved yet. This usually means the document has not been
+                  processed successfully or extraction failed on the last attempt.
                 </p>
                 {document.storagePath ? (
                   <p>
@@ -122,6 +144,31 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
               </div>
             )}
           </div>
+
+          <section className="space-y-4 rounded-[1.5rem] border border-slate-200 p-5">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-slate-950">Grounded summaries</h3>
+              <p className="text-sm leading-6 text-slate-600">
+                Each summary is generated only from this document&apos;s processed text. When a model
+                is not configured, the app falls back to deterministic extraction instead of
+                inventing unsupported claims.
+              </p>
+            </div>
+            <div className="grid gap-4">
+              {summaryCards.map(({ summaryType, config, summary, error }) => (
+                <SummaryCard
+                  key={summaryType}
+                  documentId={document.id}
+                  summaryType={summaryType}
+                  title={config.title}
+                  description={summaryDescriptions[summaryType]}
+                  summary={summary}
+                  error={error}
+                  canGenerate={canGenerateSummaries}
+                />
+              ))}
+            </div>
+          </section>
         </section>
 
         <div className="space-y-6">
@@ -132,7 +179,7 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
                 <EmptyState
                   eyebrow="Chunks"
                   title="No chunks stored yet"
-                  description="Chunk records will appear here after the parsing and chunking pipeline is added."
+                  description="Chunk records appear after processing succeeds. Re-run ingestion if this document should already be ready for retrieval."
                 />
               </div>
             ) : (
@@ -167,8 +214,9 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
           <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-950">Document actions</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              The ingestion pipeline can be rerun at any time. Summaries, search-within-document,
-              and ask-about-this actions will arrive in later phases.
+              The ingestion pipeline can be rerun at any time. Summary generation stays separate
+              from chat so this page can create durable research artifacts tied directly to the
+              source document.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <ProcessDocumentButton
