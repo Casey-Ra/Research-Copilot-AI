@@ -2,8 +2,11 @@ import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
 import { ActivitySection } from "@/components/dashboard/ActivitySection";
 import { MetricCard } from "@/components/dashboard/MetricCard";
+import { QuickActionsPanel } from "@/components/dashboard/QuickActionsPanel";
+import { WorkspacePulse } from "@/components/dashboard/WorkspacePulse";
 import { requireUser } from "@/lib/auth/session";
 import { getDashboardSnapshot, getRecentWorkspaceActivity } from "@/lib/db/dashboard";
+import { getNoteHref } from "@/lib/notes/presentation";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -46,17 +49,29 @@ export default async function DashboardPage() {
         />
       </div>
 
+      <WorkspacePulse
+        readyDocumentCount={snapshot.readyDocumentCount}
+        failedDocumentCount={snapshot.failedDocumentCount}
+        processingCoverage={snapshot.processingCoverage}
+        noteBreakdown={activity.noteBreakdown}
+      />
+
+      <QuickActionsPanel
+        readyDocumentCount={snapshot.readyDocumentCount}
+        noteCount={snapshot.noteCount}
+      />
+
       {hasAnyActivity ? (
         <div className="grid gap-6 xl:grid-cols-3">
           <ActivitySection
             title="Recent documents"
             description="The latest documents in this workspace, ordered by most recent activity."
             emptyTitle="No documents yet"
-            emptyDescription="Create a draft document from the documents page to start seeing content here."
+            emptyDescription="Upload and process a document to start seeing document activity here."
             items={activity.documents.map((document) => ({
               id: document.id,
               title: document.title,
-              meta: "Document record",
+              meta: `${document.fileName} · ${document._count.chunks} chunks · ${document._count.notes} notes`,
               updatedAt: document.updatedAt,
               href: `/documents/${document.id}`,
               badge: {
@@ -80,9 +95,11 @@ export default async function DashboardPage() {
             items={activity.notes.map((note) => ({
               id: note.id,
               title: note.title,
-              meta: `Source: ${note.sourceType.toLowerCase().replace("_", " ")}`,
+              meta: note.document
+                ? `${note.sourceLabel} · ${note.document.title}`
+                : note.sourceLabel,
               updatedAt: note.updatedAt,
-              href: "/notes",
+              href: getNoteHref(note),
             }))}
           />
           <ActivitySection
@@ -93,9 +110,9 @@ export default async function DashboardPage() {
             items={activity.chatSessions.map((chat) => ({
               id: chat.id,
               title: chat.title,
-              meta: "Chat session",
+              meta: `${chat._count.messages} messages`,
               updatedAt: chat.updatedAt,
-              href: "/chat",
+              href: `/chat?session=${chat.id}`,
             }))}
           />
         </div>

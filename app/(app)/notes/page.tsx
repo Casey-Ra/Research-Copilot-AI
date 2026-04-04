@@ -1,72 +1,20 @@
+import Link from "next/link";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
 import { NoteCard } from "@/components/notes/NoteCard";
 import { requireUser } from "@/lib/auth/session";
 import { getNotesForUser } from "@/lib/db/notes";
+import {
+  getNoteSourceLabel,
+  getNoteTags,
+  getNoteView,
+} from "@/lib/notes/presentation";
 
 type NotesPageProps = {
   searchParams?: Promise<{
     view?: string;
   }>;
 };
-
-function getTags(value: unknown) {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value.filter((item): item is string => typeof item === "string");
-}
-
-function getNoteView(note: {
-  sourceType: string;
-  tags: unknown;
-}) {
-  const tags = getTags(note.tags);
-
-  if (tags.includes("compare")) {
-    return "compare";
-  }
-
-  if (tags.includes("search")) {
-    return "search";
-  }
-
-  if (note.sourceType === "SUMMARY") {
-    return "summary";
-  }
-
-  if (note.sourceType === "CHAT_MESSAGE") {
-    return "chat";
-  }
-
-  return "other";
-}
-
-function getSourceLabel(note: {
-  sourceType: string;
-  tags: unknown;
-}) {
-  const view = getNoteView(note);
-
-  if (view === "compare") {
-    return "comparison note";
-  }
-
-  if (view === "search") {
-    return "search finding";
-  }
-
-  if (view === "summary") {
-    return "summary";
-  }
-
-  if (view === "chat") {
-    return "chat answer";
-  }
-
-  return note.sourceType.toLowerCase().replace("_", " ");
-}
 
 export default async function NotesPage({ searchParams }: NotesPageProps) {
   const user = await requireUser();
@@ -103,7 +51,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           const isActive = view.id === activeView;
 
           return (
-            <a
+            <Link
               key={view.id}
               href={view.id === "all" ? "/notes" : `/notes?view=${view.id}`}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
@@ -113,7 +61,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
               }`}
             >
               {view.label} ({view.count})
-            </a>
+            </Link>
           );
         })}
       </section>
@@ -134,8 +82,8 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
               title={note.title}
               content={note.content}
               sourceType={note.sourceType}
-              sourceLabel={getSourceLabel(note)}
-              tags={getTags(note.tags)}
+              sourceLabel={getNoteSourceLabel(note)}
+              tags={getNoteTags(note.tags)}
               updatedAt={note.updatedAt}
               document={note.document}
             />
