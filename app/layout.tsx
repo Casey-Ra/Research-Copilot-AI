@@ -17,7 +17,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         <div className="ui-shell text-slate-950">
           <Navbar />
-          <main className="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl flex-col px-5 pb-16 pt-8 sm:px-8 lg:px-10">
+          <main className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-5 pb-16 pt-8 sm:px-8 lg:px-10">
             {children}
           </main>
         </div>
