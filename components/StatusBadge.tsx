@@ -4,16 +4,16 @@ type StatusBadgeProps = {
 };
 
 const toneClasses: Record<NonNullable<StatusBadgeProps["tone"]>, string> = {
-  neutral: "bg-slate-100 text-slate-700",
-  success: "bg-emerald-100 text-emerald-700",
-  warning: "bg-amber-100 text-amber-700",
-  danger: "bg-rose-100 text-rose-700",
+  neutral: "border-[rgba(94,123,186,0.18)] bg-[rgba(47,103,218,0.08)] text-[#183a86]",
+  success: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  warning: "border-[rgba(47,103,218,0.2)] bg-[rgba(47,103,218,0.1)] text-[#183a86]",
+  danger: "border-rose-200 bg-rose-50 text-rose-700",
 };
 
 export function StatusBadge({ label, tone = "neutral" }: StatusBadgeProps) {
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${toneClasses[tone]}`}
+      className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${toneClasses[tone]}`}
     >
       {label}
     </span>

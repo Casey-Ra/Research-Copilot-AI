@@ -24,12 +24,14 @@ export function ChatMessageCard({
   return (
     <article
       className={cn(
-        "rounded-[1.75rem] border p-6 shadow-sm",
-        isAssistant ? "border-cyan-200 bg-cyan-50/40" : "border-slate-200 bg-white",
+        "rounded-[1.6rem] border p-6 shadow-[0_22px_56px_-40px_rgba(16,35,63,0.4)]",
+        isAssistant
+          ? "border-[rgba(47,103,218,0.18)] bg-[linear-gradient(180deg,_rgba(243,247,255,0.95),_rgba(232,240,255,0.7))]"
+          : "border-[rgba(136,155,194,0.22)] bg-white/86",
       )}
     >
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
+        <p className="ui-kicker">
           {isAssistant ? "Assistant" : role === "SYSTEM" ? "System" : "You"}
         </p>
         <p className="text-xs uppercase tracking-[0.16em] text-slate-400">

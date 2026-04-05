@@ -62,8 +62,8 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
     <div className="space-y-8">
       <PageHeader
         eyebrow="Notes"
-        title="Saved findings and reusable outputs"
-        description="This notes workspace now stores durable research artifacts from summaries, search, comparison, and grounded chat. It acts as the persistent layer for discoveries made elsewhere in the product."
+        title="Your saved notes"
+        description="Keep the summaries, answers, excerpts, and takeaways you want to revisit later."
       />
 
       {successMessage ? (
@@ -100,11 +100,11 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
                 Note editing
               </p>
               <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Refine any saved artifact
+                Edit any saved note
               </h2>
               <p className="text-sm leading-7 text-slate-600">
-                Manual notes can be authored from scratch, and any saved note can be revised from
-                the list below without losing its source metadata or workspace links.
+                Create notes from scratch or revise saved notes without losing their links to the
+                source material.
               </p>
             </div>
           </section>
@@ -135,7 +135,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         <EmptyState
           eyebrow="Notes"
           title="No saved notes yet"
-          description="Generate a document summary, save a search finding, or capture a comparison note to start building a reusable research notebook."
+          description="Save a summary, search result, comparison, or chat answer to start building your notebook."
           actionLabel="Open documents"
           actionHref="/documents"
         />

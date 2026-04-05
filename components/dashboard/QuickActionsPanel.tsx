@@ -38,11 +38,9 @@ export function QuickActionsPanel({
   noteCount,
 }: QuickActionsPanelProps) {
   return (
-    <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="ui-panel p-6">
       <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-          Quick actions
-        </p>
+        <p className="ui-kicker">Quick actions</p>
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
           Keep the research loop moving
         </h2>
@@ -61,12 +59,12 @@ export function QuickActionsPanel({
           <Link
             key={action.href}
             href={action.href}
-            className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 transition hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-white hover:shadow-sm"
+            className="ui-panel-soft p-5 transition hover:-translate-y-0.5 hover:border-[rgba(47,103,218,0.22)]"
           >
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-slate-950">{action.title}</h3>
               <p className="text-sm leading-6 text-slate-600">{action.description}</p>
-              <span className="text-sm font-semibold text-cyan-700">Open workflow</span>
+              <span className="text-sm font-semibold text-[#183a86]">Open workflow</span>
             </div>
           </Link>
         ))}

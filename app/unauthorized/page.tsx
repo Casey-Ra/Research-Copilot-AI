@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function UnauthorizedPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="ui-panel mx-auto flex w-full max-w-3xl flex-col gap-6 rounded-[2rem] p-8">
       <div className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#183a86]">
           Unauthorized
         </p>
         <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
@@ -19,13 +19,13 @@ export default function UnauthorizedPage() {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/sign-in"
-          className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          className="ui-btn-primary px-4 py-2"
         >
           Go to sign in
         </Link>
         <Link
           href="/"
-          className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          className="ui-btn-secondary px-4 py-2"
         >
           Back to landing page
         </Link>

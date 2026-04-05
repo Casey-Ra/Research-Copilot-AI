@@ -49,7 +49,7 @@ export function CredentialsSignInForm({ callbackUrl }: CredentialsSignInFormProp
           type="email"
           required
           defaultValue="demo@researchcopilot.local"
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none ring-0 transition focus:border-cyan-400"
+          className="ui-field"
         />
       </div>
 
@@ -63,7 +63,7 @@ export function CredentialsSignInForm({ callbackUrl }: CredentialsSignInFormProp
           type="password"
           required
           defaultValue="researchcopilot-demo"
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none ring-0 transition focus:border-cyan-400"
+          className="ui-field"
         />
       </div>
 
@@ -76,7 +76,7 @@ export function CredentialsSignInForm({ callbackUrl }: CredentialsSignInFormProp
       <button
         type="submit"
         disabled={pending}
-        className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="ui-btn-primary"
       >
         {pending ? "Signing in..." : "Sign in with demo credentials"}
       </button>

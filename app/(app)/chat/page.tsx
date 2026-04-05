@@ -46,8 +46,8 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
     <div className="space-y-8">
       <PageHeader
         eyebrow="Chat"
-        title="Grounded Q&A with stored sessions and citations"
-        description="Each assistant answer is built from retrieved document chunks, saved alongside the user message, and rendered with source citations that link back to the underlying document."
+        title="Ask questions with sources"
+        description="Get answers backed by your documents, and keep the conversation history for later."
       />
 
       {errorMessage ? (
@@ -59,8 +59,8 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
       {readyDocuments.length === 0 ? (
         <EmptyState
           eyebrow="Chat"
-          title="No retrieval-ready documents yet"
-          description="Upload and process at least one document before using grounded chat. The assistant only answers from retrieved document evidence."
+          title="No ready documents yet"
+          description="Upload and process at least one document before asking questions here."
           actionLabel="Go to upload"
           actionHref="/upload"
         />

@@ -22,74 +22,68 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="rounded-[2rem] border border-white/10 bg-slate-950/85 p-8 text-slate-50 shadow-[0_30px_80px_rgba(2,12,27,0.28)] backdrop-blur sm:p-10">
+      <section className="ui-panel-hero p-8 sm:p-10">
         <div className="space-y-6">
-          <p className="inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-            Protected access
-          </p>
+          <p className="ui-kicker-on-dark">Welcome back</p>
           <div className="space-y-4">
             <h1 className="text-4xl font-semibold tracking-tight">
-              Sign in to access your research workspace.
+              Sign in to open your documents, answers, and saved notes.
             </h1>
-            <p className="max-w-xl text-base leading-7 text-slate-300">
-              Protected app routes now require an authenticated session. Use GitHub if you have
-              OAuth credentials configured, or use the clearly marked local demo login for local
-              development.
+            <p className="max-w-xl text-base leading-7 text-slate-100/86">
+              Use GitHub if it is configured, or use the local demo login to explore the app on
+              this machine.
             </p>
           </div>
 
-          <div className="grid gap-4 rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+          <div className="grid gap-4 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-                Route protection
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-100/90">
+                What you can do here
               </p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                Middleware blocks the main app routes and the protected app layout performs a
-                second server-side session check before rendering workspace content.
+              <p className="mt-2 text-sm leading-6 text-slate-100/82">
+                Upload source material, search for key passages, compare documents, ask questions
+                with citations, and save the takeaways you want to revisit.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
+      <section className="ui-panel space-y-6 rounded-[2rem] p-8 sm:p-10">
         <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-            Sign in options
-          </p>
+          <p className="ui-kicker">Sign in options</p>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-            Choose the auth flow that fits your local setup
+            Choose how you want to sign in
           </h2>
         </div>
 
         {authProviderState.githubConfigured ? (
-          <div className="space-y-3 rounded-[1.5rem] border border-slate-200 p-5">
+          <div className="ui-panel-soft space-y-3 p-5">
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-slate-950">GitHub OAuth</h3>
               <p className="text-sm leading-6 text-slate-600">
-                Production-style sign-in powered by Auth.js with a GitHub provider.
+                Use your GitHub account to access the app.
               </p>
             </div>
             <GitHubSignInButton callbackUrl={callbackUrl} />
           </div>
         ) : (
-          <div className="rounded-[1.5rem] border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
-            GitHub OAuth is not configured yet. Add `AUTH_GITHUB_ID` and `AUTH_GITHUB_SECRET` to
-            your `.env` file when you are ready to test the provider-based flow.
+          <div className="rounded-[1.5rem] border border-[rgba(47,103,218,0.18)] bg-[rgba(47,103,218,0.08)] p-5 text-sm leading-6 text-[#183a86]">
+            GitHub sign-in is not configured on this machine yet. You can still use the local demo
+            account below.
           </div>
         )}
 
         {authProviderState.demoCredentialsEnabled ? (
-          <div className="space-y-4 rounded-[1.5rem] border border-slate-200 p-5">
+          <div className="ui-panel-soft space-y-4 p-5">
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-slate-950">Local demo credentials</h3>
               <p className="text-sm leading-6 text-slate-600">
-                Temporary development-only fallback that keeps local setup practical when OAuth is
-                not configured.
+                Use the demo account below if you just want to open the app and try the workflow.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+            <div className="rounded-2xl border border-[rgba(136,155,194,0.22)] bg-white/78 px-4 py-3 text-sm text-slate-700">
               <p>Email: {authProviderState.demoCredentials.email}</p>
               <p>Password: {authProviderState.demoCredentials.password}</p>
             </div>

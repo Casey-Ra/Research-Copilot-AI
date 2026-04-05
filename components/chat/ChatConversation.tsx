@@ -15,11 +15,9 @@ type ChatConversationProps = {
 
 export function ChatConversation({ sessionTitle, messages }: ChatConversationProps) {
   return (
-    <section className="space-y-5 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="space-y-2 border-b border-slate-100 pb-4">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-          Conversation
-        </p>
+    <section className="ui-panel space-y-5 p-6">
+      <div className="space-y-2 border-b border-[rgba(136,155,194,0.14)] pb-4">
+        <p className="ui-kicker">Conversation</p>
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
           {sessionTitle ?? "New grounded chat"}
         </h2>

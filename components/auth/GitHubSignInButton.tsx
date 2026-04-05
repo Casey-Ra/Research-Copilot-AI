@@ -13,7 +13,7 @@ export function GitHubSignInButton({ callbackUrl }: GitHubSignInButtonProps) {
       onClick={async () => {
         await signIn("github", { callbackUrl });
       }}
-      className="rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+      className="ui-btn-accent"
     >
       Continue with GitHub
     </button>

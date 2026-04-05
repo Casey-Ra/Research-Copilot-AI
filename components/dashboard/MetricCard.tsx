@@ -8,9 +8,9 @@ type MetricCardProps = {
 
 export function MetricCard({ label, value, description }: MetricCardProps) {
   return (
-    <article className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <article className="ui-panel p-5">
       <div className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+        <p className="ui-kicker">{label}</p>
         <p className="text-4xl font-semibold tracking-tight text-slate-950">
           {formatCompactNumber(value)}
         </p>

@@ -20,13 +20,11 @@ export function NoteEditorForm({ mode, note, activeView, cancelHref }: NoteEdito
       : updateNoteAction.bind(null, note?.id ?? "");
 
   return (
-    <form action={action} className="space-y-4 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <form action={action} className="ui-panel space-y-4 p-6">
       {activeView ? <input type="hidden" name="view" value={activeView} /> : null}
 
       <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-          {mode === "create" ? "Manual note" : "Edit note"}
-        </p>
+        <p className="ui-kicker">{mode === "create" ? "Manual note" : "Edit note"}</p>
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
           {mode === "create" ? "Write a research note" : "Refine a saved note"}
         </h2>
@@ -44,7 +42,7 @@ export function NoteEditorForm({ mode, note, activeView, cancelHref }: NoteEdito
           name="title"
           defaultValue={note?.title ?? ""}
           placeholder="Launch risks to revisit"
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-cyan-400"
+          className="ui-field"
           required
         />
       </label>
@@ -56,7 +54,7 @@ export function NoteEditorForm({ mode, note, activeView, cancelHref }: NoteEdito
           defaultValue={note?.content ?? ""}
           placeholder="Capture your grounded takeaway, action item, or follow-up question here."
           rows={8}
-          className="w-full rounded-[1.5rem] border border-slate-200 bg-white px-4 py-3 text-sm leading-7 text-slate-950 outline-none transition focus:border-cyan-400"
+          className="ui-field min-h-[12rem] resize-y leading-7"
           required
         />
       </label>
@@ -68,21 +66,21 @@ export function NoteEditorForm({ mode, note, activeView, cancelHref }: NoteEdito
           name="tags"
           defaultValue={note?.tags.join(", ") ?? ""}
           placeholder="launch, risks, follow-up"
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-cyan-400"
+          className="ui-field"
         />
       </label>
 
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          className="rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+          className="ui-btn-primary"
         >
           {mode === "create" ? "Save manual note" : "Update note"}
         </button>
         {cancelHref ? (
           <Link
             href={cancelHref}
-            className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            className="ui-btn-secondary"
           >
             Cancel
           </Link>

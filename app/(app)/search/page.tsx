@@ -72,8 +72,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     <div className="space-y-8">
       <PageHeader
         eyebrow="Search"
-        title="Semantic retrieval over processed document chunks"
-        description="Search across retrieval-ready chunks with semantic ranking, document and file-type scoping, time-based filtering, and clear provenance back to the source material."
+        title="Search your documents"
+        description="Find the most relevant passages across your files and jump back to the source."
       />
 
       <SearchFilters
@@ -94,8 +94,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {query.length === 0 ? (
         <EmptyState
           eyebrow="Search"
-          title="Run your first semantic query"
-          description="Enter a research question above to rank the most relevant embedded chunks across your READY documents, then refine the scope with document, file-type, and date filters."
+          title="Start with a question or topic"
+          description="Search across your processed documents, then narrow the results by file, type, or recency."
         />
       ) : searchResponse.results.length === 0 ? (
         <EmptyState

@@ -51,15 +51,15 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
     <div className="space-y-8">
       <PageHeader
         eyebrow="Compare"
-        title="Compare processed documents side by side"
-        description="This workflow uses existing chunk embeddings and extracted text to show overlap, divergence, and focus-aware evidence across two READY documents."
+        title="Compare two documents"
+        description="See where two sources agree, where they differ, and which passages support each view."
       />
 
       {documents.length < 2 ? (
         <EmptyState
           eyebrow="Compare"
-          title="You need at least two READY documents"
-          description="Upload and process at least two documents before running a grounded comparison workflow."
+          title="You need at least two ready documents"
+          description="Upload and process at least two documents before comparing them here."
           actionLabel="Open upload"
           actionHref="/upload"
         />
@@ -84,7 +84,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
               title={comparisonError ? "Comparison unavailable" : "Pick two documents to begin"}
               description={
                 comparisonError ??
-                "Choose a left and right document above, then optionally add a focus query if you want to compare them around a specific theme or question."
+                "Choose two documents above, then add an optional focus topic if you want to compare them around one question."
               }
             />
           ) : (
@@ -113,7 +113,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                   <EmptyState
                     eyebrow="Shared evidence"
                     title="No strong overlaps surfaced"
-                    description="The sampled chunk pairs did not produce strong cross-document matches. Try a focus query or compare a different pair."
+                    description="Try adding a focus topic or compare a different pair of documents."
                   />
                 ) : (
                   <div className="space-y-4">
@@ -139,12 +139,12 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
               <div className="grid gap-6 xl:grid-cols-2">
                 <UniqueEvidencePanel
                   title={`Distinct to ${comparison.leftDocument.title}`}
-                  description="These chunks are comparatively less similar to the right document and help explain what this document adds on its own."
+                  description="Passages that stand out more clearly in this document."
                   items={comparison.uniqueToLeft}
                 />
                 <UniqueEvidencePanel
                   title={`Distinct to ${comparison.rightDocument.title}`}
-                  description="These chunks are comparatively less similar to the left document and help explain what makes this document stand apart."
+                  description="Passages that stand out more clearly in this document."
                   items={comparison.uniqueToRight}
                 />
               </div>

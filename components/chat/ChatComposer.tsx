@@ -18,13 +18,11 @@ export function ChatComposer({
   documents,
 }: ChatComposerProps) {
   return (
-    <form action={sendChatMessageAction} className="space-y-6 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <form action={sendChatMessageAction} className="ui-panel space-y-6 p-6">
       {activeSessionId ? <input type="hidden" name="chatSessionId" value={activeSessionId} /> : null}
 
       <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-          Grounded prompt
-        </p>
+        <p className="ui-kicker">Grounded prompt</p>
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
           Ask a question against retrieved evidence
         </h2>
@@ -42,7 +40,7 @@ export function ChatComposer({
           name="question"
           rows={5}
           placeholder="What are the most important claims in these documents, and what evidence supports them?"
-          className="w-full rounded-[1.5rem] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-cyan-400"
+          className="ui-field min-h-[10rem] resize-y"
         />
       </label>
 
@@ -52,7 +50,7 @@ export function ChatComposer({
         </p>
         <button
           type="submit"
-          className="rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+          className="ui-btn-primary"
         >
           Send question
         </button>

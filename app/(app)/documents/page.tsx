@@ -13,19 +13,19 @@ export default async function DocumentsPage() {
     <div className="space-y-8">
       <PageHeader
         eyebrow="Documents"
-        title="Manage the research corpus for this workspace"
-        description="This page now shows real user-owned document records created through the local upload pipeline. Uploads, statuses, storage paths, and ownership all flow through the server-side document services."
+        title="Your documents"
+        description="Open a file, check its status, and jump into summaries, search, or chat."
       />
 
       <section className="flex flex-col gap-4 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">Upload pipeline</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">Add a document</p>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
             Add TXT, PDF, or pasted text
           </h2>
           <p className="max-w-2xl text-sm leading-7 text-slate-600">
-            Uploaded files are stored locally for development and document records are created with
-            an `UPLOADED` status so the parsing phase can pick them up next.
+            Bring in source material so you can search it, summarize it, compare it, or ask
+            questions about it.
           </p>
         </div>
         <Link
@@ -40,7 +40,7 @@ export default async function DocumentsPage() {
         <EmptyState
           eyebrow="Documents"
           title="No documents yet"
-          description="Upload a TXT or PDF file, or paste text into the upload page to create your first document record."
+          description="Upload a TXT or PDF file, or paste text, to create your first document."
           actionLabel="Go to upload"
           actionHref="/upload"
         />

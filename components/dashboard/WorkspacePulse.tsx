@@ -20,17 +20,15 @@ export function WorkspacePulse({
   noteBreakdown,
 }: WorkspacePulseProps) {
   return (
-    <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="ui-panel p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-            Workspace pulse
-          </p>
+          <p className="ui-kicker">Workspace pulse</p>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-            Processing and capture health
+            What is ready right now
           </h2>
           <p className="text-sm leading-7 text-slate-600">
-            A quick read on how much of the workspace is retrieval-ready and what kinds of research artifacts you are saving.
+            See how much of your content is ready to use and what kinds of notes you have saved.
           </p>
         </div>
         <StatusBadge
@@ -40,37 +38,37 @@ export function WorkspacePulse({
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-[1.5rem] bg-slate-50 p-5">
+        <div className="ui-panel-soft p-5">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-slate-950">Processing coverage</p>
             <p className="text-2xl font-semibold tracking-tight text-slate-950">
               {processingCoverage}%
             </p>
           </div>
-          <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-200">
+          <div className="mt-4 h-3 overflow-hidden rounded-full bg-[rgba(47,103,218,0.12)]">
             <div
-              className="h-full rounded-full bg-cyan-500"
+              className="h-full rounded-full bg-[linear-gradient(90deg,_#0b1220,_#2f67da)]"
               style={{ width: `${processingCoverage}%` }}
             />
           </div>
           <p className="mt-4 text-sm leading-6 text-slate-600">
             {readyDocumentCount > 1
-              ? "The workspace is ready for compare, search, summaries, and grounded chat."
+              ? "Your documents are ready for search, summaries, comparison, and chat."
               : readyDocumentCount === 1
-                ? "Most workflows are unlocked, but document comparison will benefit from one more READY document."
-                : "Upload and process documents to unlock retrieval-backed workflows."}
+                ? "Most actions are ready, and one more processed document will unlock comparison."
+                : "Upload and process documents to start searching, comparing, and chatting with sources."}
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               href={failedDocumentCount > 0 ? "/documents" : "/upload"}
-              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+              className="ui-btn-secondary px-4 py-2"
             >
               {failedDocumentCount > 0 ? "Review failed docs" : "Add documents"}
             </Link>
             {readyDocumentCount > 1 ? (
               <Link
                 href="/compare"
-                className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="ui-btn-primary px-4 py-2"
               >
                 Open compare
               </Link>
@@ -78,8 +76,8 @@ export function WorkspacePulse({
           </div>
         </div>
 
-        <div className="rounded-[1.5rem] bg-slate-50 p-5">
-          <p className="text-sm font-semibold text-slate-950">Saved artifact mix</p>
+        <div className="ui-panel-soft p-5">
+          <p className="text-sm font-semibold text-slate-950">Saved notes by type</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {[
               { label: "Summaries", value: noteBreakdown.summary, href: "/notes?view=summary" },
@@ -90,9 +88,9 @@ export function WorkspacePulse({
               <Link
                 key={item.label}
                 href={item.href}
-                className="rounded-[1.25rem] border border-slate-200 bg-white p-4 transition hover:border-cyan-200 hover:bg-cyan-50/40"
+                className="rounded-[1.25rem] border border-[rgba(136,155,194,0.2)] bg-white/88 p-4 transition hover:border-[rgba(47,103,218,0.24)] hover:bg-white"
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                <p className="ui-kicker">
                   {item.label}
                 </p>
                 <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">

@@ -63,7 +63,7 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
       <PageHeader
         eyebrow="Document Detail"
         title={document.title}
-        description="This detail page is now grounded in real processed content. You can inspect chunk data, generate citation-safe summaries from the extracted text, and save summary outputs into your notes workspace."
+        description="Review this document, inspect extracted passages, generate summaries, and ask questions about it."
       />
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -126,8 +126,8 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
             ) : (
               <div className="mt-3 space-y-3 text-sm leading-7 text-slate-600">
                 <p>
-                  No extracted text has been saved yet. This usually means the document has not been
-                  processed successfully or extraction failed on the last attempt.
+                  No extracted text is available yet. The file may still need to be processed, or
+                  the last processing attempt may have failed.
                 </p>
                 {document.storagePath ? (
                   <p>
@@ -150,9 +150,8 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-slate-950">Grounded summaries</h3>
               <p className="text-sm leading-6 text-slate-600">
-                Each summary is generated only from this document&apos;s processed text. When a model
-                is not configured, the app falls back to deterministic extraction instead of
-                inventing unsupported claims.
+                Create a quick overview, bullet summary, key takeaways, or action items from this
+                document.
               </p>
             </div>
             <div className="grid gap-4">
@@ -180,7 +179,7 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
                 <EmptyState
                   eyebrow="Chunks"
                   title="No chunks stored yet"
-                  description="Chunk records appear after processing succeeds. Re-run ingestion if this document should already be ready for retrieval."
+                  description="Process the document to break it into searchable passages."
                 />
               </div>
             ) : (
@@ -215,9 +214,8 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
           <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-950">Document actions</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              The ingestion pipeline can be rerun at any time. Summary generation stays separate
-              from chat so this page can create durable research artifacts tied directly to the
-              source document.
+              Reprocess the file, search within it, ask questions about it, or remove it from your
+              workspace.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <ProcessDocumentButton

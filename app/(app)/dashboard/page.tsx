@@ -22,30 +22,30 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <PageHeader
         eyebrow="Dashboard"
-        title="Your research workspace at a glance"
-        description="See the health of your workspace, recent activity across documents and notes, and the fastest next steps for moving from upload to grounded research output."
+        title="Pick up where you left off"
+        description="See recent documents, chats, notes, and the fastest next steps for continuing your work."
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           label="Documents"
           value={snapshot.documentCount}
-          description="All document records currently owned by this signed-in user."
+          description="Everything you have added to this workspace."
         />
         <MetricCard
           label="Ready docs"
           value={snapshot.readyDocumentCount}
-          description="Documents already processed and available for search, comparison, summaries, and chat."
+          description="Files that are ready for search, summaries, comparison, and chat."
         />
         <MetricCard
           label="Chat sessions"
           value={snapshot.chatSessionCount}
-          description="Saved grounded conversations tied back to the user's document workspace."
+          description="Saved conversations you can reopen any time."
         />
         <MetricCard
           label="Notes"
           value={snapshot.noteCount}
-          description="Persistent findings captured from summaries, search, comparison, and chat."
+          description="Saved takeaways, excerpts, and answers."
         />
       </div>
 
@@ -65,7 +65,7 @@ export default async function DashboardPage() {
         <div className="grid gap-6 xl:grid-cols-3">
           <ActivitySection
             title="Recent documents"
-            description="The latest documents in this workspace, ordered by most recent activity."
+            description="The files you worked with most recently."
             emptyTitle="No documents yet"
             emptyDescription="Upload and process a document to start seeing document activity here."
             items={activity.documents.map((document) => ({
@@ -89,7 +89,7 @@ export default async function DashboardPage() {
           />
           <ActivitySection
             title="Recent notes"
-            description="Saved findings and note records connected to this user's workspace."
+            description="The latest saved takeaways from your work."
             emptyTitle="No notes yet"
             emptyDescription="Notes will appear here once you save a summary or capture a grounded chat answer."
             items={activity.notes.map((note) => ({
@@ -104,7 +104,7 @@ export default async function DashboardPage() {
           />
           <ActivitySection
             title="Recent chats"
-            description="Conversation threads created in the workspace for grounded document Q&A."
+            description="Recent conversations you can continue from here."
             emptyTitle="No chat sessions yet"
             emptyDescription="Ask a grounded question in chat to start building conversation history."
             items={activity.chatSessions.map((chat) => ({
@@ -119,8 +119,8 @@ export default async function DashboardPage() {
       ) : (
         <EmptyState
           eyebrow="Workspace activity"
-          title="Your dashboard is ready for real data"
-          description="Upload and process a document to start populating dashboard cards, search results, comparisons, and saved notes."
+          title="Your workspace is ready"
+          description="Upload a document to start building searches, summaries, chats, and notes."
           actionLabel="Open documents"
           actionHref="/documents"
         />

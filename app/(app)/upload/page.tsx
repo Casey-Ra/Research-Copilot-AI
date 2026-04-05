@@ -7,8 +7,8 @@ export default function UploadPage() {
     <div className="space-y-8">
       <PageHeader
         eyebrow="Upload"
-        title="Upload research documents into the workspace"
-        description="Files and pasted text are validated, stored through a replaceable storage abstraction, and moved through a clean ingestion lifecycle from upload to retrieval-ready document data."
+        title="Add a document"
+        description="Upload a file or paste text to start searching, summarizing, comparing, and asking questions."
       />
 
       <UploadDocumentForm />
@@ -20,21 +20,21 @@ export default function UploadPage() {
               Supported now
             </p>
             <p className="text-sm leading-7 text-slate-600">
-              TXT, PDF, and pasted text with local filesystem storage for development.
+              TXT, PDF, and pasted text.
             </p>
           </div>
           <div className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-              Processing pipeline
+              What happens next
             </p>
             <p className="text-sm leading-7 text-slate-600">
-              Uploaded sources move through extraction, chunking, embeddings, and status updates so
-              they can be searched, summarized, compared, and used in grounded chat.
+              Once your file is processed, you can search it, generate summaries, compare it with
+              other sources, and ask questions with citations.
             </p>
           </div>
           <div className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-              Manage records
+              Open documents
             </p>
             <Link
               href="/documents"

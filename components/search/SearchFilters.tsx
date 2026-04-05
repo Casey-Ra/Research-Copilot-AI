@@ -24,11 +24,9 @@ export function SearchFilters({
   const availableFileTypes = Array.from(new Set(documents.map((document) => document.fileType))).sort();
 
   return (
-    <form className="space-y-6 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <form className="ui-panel space-y-6 p-6">
       <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">
-          Retrieval query
-        </p>
+        <p className="ui-kicker">Retrieval query</p>
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
           Search across embedded document chunks
         </h2>
@@ -46,7 +44,7 @@ export function SearchFilters({
             name="query"
             defaultValue={query}
             placeholder="What does this document say about grounded answers?"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-cyan-400"
+            className="ui-field"
           />
         </label>
 
@@ -55,7 +53,7 @@ export function SearchFilters({
           <select
             name="dateWindow"
             defaultValue={dateWindowDays ? String(dateWindowDays) : "any"}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-cyan-400"
+            className="ui-field"
           >
             <option value="any">Any time</option>
             <option value="7">Last 7 days</option>
@@ -69,7 +67,7 @@ export function SearchFilters({
           <select
             name="limit"
             defaultValue={String(limit)}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-cyan-400"
+            className="ui-field"
           >
             <option value="5">Top 5</option>
             <option value="8">Top 8</option>
@@ -89,14 +87,14 @@ export function SearchFilters({
             {availableFileTypes.map((fileType) => (
               <label
                 key={fileType}
-                className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700"
+                className="inline-flex items-center gap-3 rounded-full border border-[rgba(136,155,194,0.22)] bg-white/88 px-4 py-3 text-sm text-slate-700"
               >
                 <input
                   type="checkbox"
                   name="fileType"
                   value={fileType}
                   defaultChecked={selectedFileTypes.includes(fileType)}
-                  className="h-4 w-4 rounded border-slate-300 text-cyan-600"
+                  className="h-4 w-4 rounded border-slate-300 text-[#2f67da]"
                 />
                 <span>{fileType}</span>
               </label>
@@ -116,14 +114,14 @@ export function SearchFilters({
             {documents.map((document) => (
               <label
                 key={document.id}
-                className="flex gap-3 rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4"
+                className="flex gap-3 rounded-[1.25rem] border border-[rgba(136,155,194,0.22)] bg-[linear-gradient(180deg,_rgba(243,247,255,0.92),_rgba(255,253,246,0.92))] p-4"
               >
                 <input
                   type="checkbox"
                   name="documentId"
                   value={document.id}
                   defaultChecked={selectedDocumentIds.includes(document.id)}
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-600"
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-[#2f67da]"
                 />
                 <span className="space-y-1">
                   <span className="block text-sm font-semibold text-slate-950">{document.title}</span>
@@ -141,7 +139,7 @@ export function SearchFilters({
 
       <button
         type="submit"
-        className="rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+        className="ui-btn-primary"
       >
         Run semantic search
       </button>

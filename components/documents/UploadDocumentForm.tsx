@@ -15,7 +15,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+      className="ui-btn-primary"
     >
       {pending ? "Uploading..." : "Upload document"}
     </button>
@@ -32,15 +32,15 @@ export function UploadDocumentForm() {
   );
 
   return (
-    <form action={action} className="grid gap-6 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <form action={action} className="ui-panel grid gap-6 p-6">
       <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">Upload</p>
+        <p className="ui-kicker">Upload</p>
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-          Add source material to your workspace
+          Add a source you want to work with
         </h2>
         <p className="max-w-3xl text-sm leading-7 text-slate-600">
-          Files are stored locally for development, validated before ingestion, and processed into
-          extracted text, chunks, and retrieval-ready document records.
+          Upload a file or paste text so you can search it, summarize it, compare it, and ask
+          questions about it.
         </p>
       </div>
 
@@ -51,7 +51,7 @@ export function UploadDocumentForm() {
             <input
               name="title"
               placeholder="2026 annual industry report"
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-cyan-400"
+              className="ui-field"
             />
           </label>
 
@@ -59,8 +59,8 @@ export function UploadDocumentForm() {
             className={cn(
               "block rounded-[1.5rem] border border-dashed p-5 transition",
               isDragging
-                ? "border-cyan-500 bg-cyan-50"
-                : "border-slate-300 bg-slate-50 hover:border-cyan-400 hover:bg-cyan-50/40",
+                ? "border-[#2f67da] bg-[rgba(47,103,218,0.08)]"
+                : "border-[rgba(136,155,194,0.28)] bg-[linear-gradient(180deg,_rgba(243,247,255,0.88),_rgba(255,253,246,0.92))] hover:border-[rgba(47,103,218,0.3)] hover:bg-white",
             )}
             onDragEnter={() => setIsDragging(true)}
             onDragLeave={() => setIsDragging(false)}
@@ -92,7 +92,7 @@ export function UploadDocumentForm() {
             name="pastedText"
             rows={12}
             placeholder="Paste article notes, meeting transcripts, or copied source text here if you do not want to upload a file."
-            className="w-full rounded-[1.5rem] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-cyan-400"
+            className="ui-field min-h-[18rem] resize-y"
           />
           <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
             File upload and pasted text are mutually optional; submit either one.
@@ -114,7 +114,7 @@ export function UploadDocumentForm() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
-          Storage is local for development and abstracted for future cloud replacement
+          Supports TXT, PDF, and pasted text
         </p>
         <SubmitButton />
       </div>

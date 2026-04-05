@@ -31,8 +31,8 @@ export function ActivitySection({
   items,
 }: ActivitySectionProps) {
   return (
-    <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex flex-col gap-2 border-b border-slate-100 pb-4">
+    <section className="ui-panel p-6">
+      <div className="flex flex-col gap-2 border-b border-[rgba(136,155,194,0.14)] pb-4">
         <h2 className="text-xl font-semibold tracking-tight text-slate-950">{title}</h2>
         <p className="text-sm leading-6 text-slate-600">{description}</p>
       </div>
@@ -46,10 +46,10 @@ export function ActivitySection({
           />
         </div>
       ) : (
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-[rgba(136,155,194,0.14)]">
           {items.map((item) => {
             const content = (
-              <div className="flex flex-col gap-3 py-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-3 rounded-[1.1rem] px-1 py-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-sm font-semibold text-slate-950">{item.title}</p>
@@ -64,7 +64,7 @@ export function ActivitySection({
             );
 
             return item.href ? (
-              <Link key={item.id} href={item.href} className="block transition hover:bg-slate-50">
+              <Link key={item.id} href={item.href} className="block transition hover:bg-white/55">
                 {content}
               </Link>
             ) : (

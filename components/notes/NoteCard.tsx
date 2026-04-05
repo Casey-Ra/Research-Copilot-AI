@@ -33,10 +33,10 @@ export function NoteCard({
   document,
 }: NoteCardProps) {
   return (
-    <article className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <article className="ui-panel p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
+          <p className="ui-kicker">
             {sourceLabel ?? formatSourceType(sourceType)}
           </p>
           <h2 className="text-xl font-semibold tracking-tight text-slate-950">{title}</h2>
@@ -51,7 +51,7 @@ export function NoteCard({
           {tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500"
+              className="ui-chip"
             >
               {tag}
             </span>
@@ -59,7 +59,7 @@ export function NoteCard({
         </div>
       ) : null}
 
-      <div className="mt-4 rounded-[1.25rem] bg-slate-50 p-4">
+      <div className="mt-4 rounded-[1.25rem] bg-[linear-gradient(180deg,_rgba(243,247,255,0.92),_rgba(255,253,246,0.92))] p-4">
         <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">{content}</p>
       </div>
 
@@ -78,7 +78,7 @@ export function NoteCard({
             {document ? (
               <Link
                 href={`/documents/${document.id}`}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                className="ui-btn-secondary px-4 py-2"
               >
                 Open document
               </Link>

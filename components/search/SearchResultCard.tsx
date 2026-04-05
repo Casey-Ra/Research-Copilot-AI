@@ -48,12 +48,10 @@ export function SearchResultCard({ rank, query, result }: SearchResultCardProps)
   const highlightedParts = buildHighlightedParts(result.text, query);
 
   return (
-    <article className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <article className="ui-panel p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
-            Result {rank}
-          </p>
+          <p className="ui-kicker">Result {rank}</p>
           <h3 className="text-xl font-semibold tracking-tight text-slate-950">
             {result.documentTitle}
           </h3>
@@ -61,22 +59,24 @@ export function SearchResultCard({ rank, query, result }: SearchResultCardProps)
             {result.fileName} · {result.fileType}
           </p>
         </div>
-        <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
+        <div className="rounded-full border border-[rgba(136,155,194,0.2)] bg-[rgba(47,103,218,0.08)] px-4 py-2 text-sm font-semibold text-[#183a86]">
           Score {result.score.toFixed(3)}
         </div>
       </div>
 
-      <p className="mt-4 text-sm leading-7 text-slate-700">
-        {highlightedParts.map((part, index) =>
-          part.match ? (
-            <mark key={index} className="rounded bg-cyan-100 px-1 text-slate-950">
-              {part.text}
-            </mark>
-          ) : (
-            <span key={index}>{part.text}</span>
-          ),
-        )}
-      </p>
+      <div className="mt-4 rounded-[1.25rem] bg-[linear-gradient(180deg,_rgba(243,247,255,0.92),_rgba(255,253,246,0.92))] p-4">
+        <p className="text-sm leading-7 text-slate-700">
+          {highlightedParts.map((part, index) =>
+            part.match ? (
+              <mark key={index} className="rounded bg-[rgba(47,103,218,0.18)] px-1 text-slate-950">
+                {part.text}
+              </mark>
+            ) : (
+              <span key={index}>{part.text}</span>
+            ),
+          )}
+        </p>
+      </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.16em] text-slate-400">
@@ -99,7 +99,7 @@ export function SearchResultCard({ rank, query, result }: SearchResultCardProps)
           />
           <Link
             href={`/documents/${result.documentId}`}
-            className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="ui-btn-primary px-4 py-2"
           >
             Open source
           </Link>

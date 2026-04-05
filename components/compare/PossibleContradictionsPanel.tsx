@@ -43,11 +43,9 @@ export function PossibleContradictionsPanel({
   rightTitle,
 }: PossibleContradictionsPanelProps) {
   return (
-    <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="ui-panel p-6">
       <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-          Possible contradictions
-        </p>
+        <p className="ui-kicker">Possible contradictions</p>
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
           Tension points worth reviewing
         </h2>
@@ -58,15 +56,15 @@ export function PossibleContradictionsPanel({
       </div>
 
       {items.length === 0 ? (
-        <div className="mt-5 rounded-[1.25rem] border border-dashed border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+        <div className="mt-5 rounded-[1.25rem] border border-dashed border-[rgba(136,155,194,0.24)] bg-[linear-gradient(180deg,_rgba(243,247,255,0.92),_rgba(250,252,255,0.95))] p-4 text-sm leading-6 text-slate-600">
           No supported contradiction signals surfaced from the compared evidence.
         </div>
       ) : (
         <div className="mt-5 space-y-4">
           {items.map((item, index) => (
-            <article key={`${item.left.chunkIndex}-${item.right.chunkIndex}-${index}`} className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
+            <article key={`${item.left.chunkIndex}-${item.right.chunkIndex}-${index}`} className="ui-panel-soft p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-amber-700">
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#183a86]">
                   Signal {index + 1}
                 </p>
                 <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
@@ -76,14 +74,14 @@ export function PossibleContradictionsPanel({
               <p className="mt-3 text-sm leading-7 text-slate-700">{item.reason}</p>
 
               <div className="mt-4 grid gap-4 xl:grid-cols-2">
-                <div className="rounded-[1.25rem] bg-white p-4">
+                <div className="rounded-[1.25rem] bg-white/88 p-4">
                   <p className="text-sm font-semibold text-slate-950">{leftTitle}</p>
                   <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">
                     Chunk {item.left.chunkIndex + 1} · {renderLocation(item.left)}
                   </p>
                   <p className="mt-3 text-sm leading-7 text-slate-700">{item.left.text}</p>
                 </div>
-                <div className="rounded-[1.25rem] bg-white p-4">
+                <div className="rounded-[1.25rem] bg-white/88 p-4">
                   <p className="text-sm font-semibold text-slate-950">{rightTitle}</p>
                   <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">
                     Chunk {item.right.chunkIndex + 1} · {renderLocation(item.right)}
