@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth/session";
 import { ingestDocumentForUser } from "@/lib/documents/ingestion";
 import { getDocumentSummaryFromMetadata } from "@/lib/documents/metadata";
 import { generateDocumentSummaryForUser, getSummaryConfig } from "@/lib/documents/summaries";
+import { createDocumentAndIngestForUser } from "@/lib/documents/create-and-ingest";
 import { getDocumentStorage } from "@/lib/documents/storage";
 import { validateUploadInput } from "@/lib/documents/validation";
 import { getErrorMessage } from "@/lib/utils/errors";
@@ -24,43 +25,29 @@ export async function uploadDocumentAction(
   formData: FormData,
 ): Promise<UploadDocumentActionState> {
   const user = await requireUser();
-  const storage = getDocumentStorage();
   const validationResult = await validateUploadInput(formData);
 
   if (!validationResult.ok) {
     return { error: validationResult.error };
   }
 
-  const storedObject = await storage.saveFile({
-    userId: user.id,
-    fileName: validationResult.fileName,
-    fileType: validationResult.fileType,
-    bytes: validationResult.bytes,
-  });
-
-  const document = await prisma.document.create({
-    data: {
+  try {
+    const { documentId, chunkCount, fileName } = await createDocumentAndIngestForUser({
       userId: user.id,
       title: validationResult.title,
-      fileName: storedObject.fileName,
-      fileType: storedObject.fileType,
-      storagePath: storedObject.storagePath,
-      fileSizeBytes: storedObject.fileSizeBytes,
-      status: "UPLOADED",
+      fileName: validationResult.fileName,
+      fileType: validationResult.fileType,
+      bytes: validationResult.bytes,
       metadata: {
         sourceKind: validationResult.sourceKind,
         uploadedAt: new Date().toISOString(),
       },
-    },
-  });
-
-  try {
-    const ingestionResult = await ingestDocumentForUser(document.id, user.id);
+    });
     logger.info("document.upload.completed", {
       userId: user.id,
-      documentId: document.id,
-      chunkCount: ingestionResult.chunkCount,
-      fileType: storedObject.fileType,
+      documentId,
+      chunkCount,
+      fileType: validationResult.fileType,
     });
 
     revalidatePath("/dashboard");
@@ -68,13 +55,12 @@ export async function uploadDocumentAction(
     revalidatePath("/documents");
 
     return {
-      success: `Uploaded ${storedObject.fileName}, extracted text, and stored ${ingestionResult.chunkCount} chunks.`,
+      success: `Uploaded ${fileName}, extracted text, and stored ${chunkCount} chunks.`,
     };
   } catch (error) {
     const message = getErrorMessage(error, "Unknown ingestion error.");
     logger.error("document.upload.failed", {
       userId: user.id,
-      documentId: document.id,
       message,
     });
 
@@ -83,7 +69,7 @@ export async function uploadDocumentAction(
     revalidatePath("/documents");
 
     return {
-      error: `The file was uploaded, but processing failed. The document is marked FAILED. ${message}`,
+      error: `Could not finish processing this upload. ${message}`,
     };
   }
 }

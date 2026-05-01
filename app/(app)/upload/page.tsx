@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { UploadDocumentForm } from "@/components/documents/UploadDocumentForm";
+import { WebTopicImportForm } from "@/components/documents/WebTopicImportForm";
 
 export default function UploadPage() {
   return (
@@ -13,6 +14,8 @@ export default function UploadPage() {
 
       <UploadDocumentForm />
 
+      <WebTopicImportForm />
+
       <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
         <div className="grid gap-6 md:grid-cols-3">
           <div className="space-y-2">
@@ -20,7 +23,7 @@ export default function UploadPage() {
               Supported now
             </p>
             <p className="text-sm leading-7 text-slate-600">
-              TXT, PDF, and pasted text.
+              TXT, PDF, pasted text, and topic imports from Wikipedia + DuckDuckGo.
             </p>
           </div>
           <div className="space-y-2">
